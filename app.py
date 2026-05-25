@@ -116,10 +116,6 @@ class StudyPlan(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-with app.app_context():
-    db.create_all()
-
-
 # ============================================
 # UPDATE STUDY STREAK DECORATOR
 # ============================================
@@ -845,8 +841,13 @@ def upload_profile_image():
 
 
 # ============================================
-# RUN APP
+# RUN APP - Database will be recreated on each deploy
 # ============================================
+
+with app.app_context():
+    db.drop_all()
+    db.create_all()
+    print("✅ Database recreated successfully!")
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
