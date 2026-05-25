@@ -1,39 +1,39 @@
 ﻿{% extends "base.html" %}
 {% block content %}
 <div>
-    <h1 style="margin-bottom: 10px;">Dashboard</h1>
-    <p style="opacity: 0.7; margin-bottom: 30px;">Your AI-powered study hub</p>
+    <h1 data-key="dashboard">Dashboard</h1>
+    <p style="opacity: 0.7; margin-bottom: 30px;" data-key="welcome">Your AI-powered study hub</p>
 
     <div class="stats-grid">
         <div class="stat-card">
             <i class="fas fa-comments"></i>
             <h3>{{ total_chats }}</h3>
-            <p>AI Conversations</p>
+            <p data-key="totalChats">AI Conversations</p>
         </div>
         <div class="stat-card">
             <i class="fas fa-file-alt"></i>
             <h3>{{ total_notes }}</h3>
-            <p>Notes Uploaded</p>
+            <p data-key="notesUploaded">Notes Uploaded</p>
         </div>
         <div class="stat-card">
             <i class="fas fa-question-circle"></i>
             <h3>{{ total_quizzes }}</h3>
-            <p>Quizzes Taken</p>
+            <p data-key="quizzesTaken">Quizzes Taken</p>
         </div>
         <div class="stat-card">
             <i class="fas fa-layer-group"></i>
             <h3>{{ total_flashcards }}</h3>
-            <p>Flashcards</p>
+            <p data-key="flashcardsCreated">Flashcards</p>
         </div>
     </div>
 
     <div class="card">
-        <h3>Quick Actions</h3>
+        <h3 data-key="quickActions">Quick Actions</h3>
         <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
-            <a href="{{ url_for('chat') }}" class="btn-primary">💬 Chat with AI</a>
-            <a href="{{ url_for('notes') }}" class="btn-primary">📄 Upload Notes</a>
-            <a href="{{ url_for('quiz') }}" class="btn-primary">📝 Generate Quiz</a>
-            <a href="{{ url_for('planner') }}" class="btn-primary">📅 Create Plan</a>
+            <a href="{{ url_for('chat') }}" class="btn-primary" data-key="chatWithAI">💬 Chat with AI</a>
+            <a href="{{ url_for('notes') }}" class="btn-primary" data-key="uploadNotes">📄 Upload Notes</a>
+            <a href="{{ url_for('quiz') }}" class="btn-primary" data-key="generateQuiz">📝 Generate Quiz</a>
+            <a href="{{ url_for('planner') }}" class="btn-primary" data-key="createPlan">📅 Create Plan</a>
         </div>
     </div>
 </div>

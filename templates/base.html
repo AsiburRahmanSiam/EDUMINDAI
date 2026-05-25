@@ -13,23 +13,45 @@
             --primary-dark: #6d28d9;
             --primary-light: #8b5cf6;
             --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --pink: #ec4899;
+            --cyan: #06b6d4;
             --dark-bg: #0f172a;
             --light-bg: #f8fafc;
             --dark-text: #f8fafc;
             --light-text: #0f172a;
-            --gray: #64748b;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--dark-bg);
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
             color: var(--dark-text);
             transition: all 0.3s ease;
             overflow-x: hidden;
         }
         body.light {
-            background: var(--light-bg);
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
             color: var(--light-text);
+        }
+        /* Animated Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(139, 92, 246, 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            50% { opacity: 0.5; }
         }
         /* Sidebar */
         .sidebar {
@@ -38,9 +60,9 @@
             top: 0;
             width: 280px;
             height: 100vh;
-            background: rgba(15, 23, 42, 0.98);
+            background: rgba(10, 15, 25, 0.95);
             backdrop-filter: blur(15px);
-            border-right: 1px solid rgba(139, 92, 246, 0.2);
+            border-right: 1px solid rgba(139, 92, 246, 0.3);
             z-index: 100;
             transition: transform 0.3s ease;
         }
@@ -48,8 +70,8 @@
             background: rgba(255, 255, 255, 0.95);
             border-right: 1px solid rgba(0,0,0,0.1);
         }
-        .sidebar-header { padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #8b5cf6, #06b6d4); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid rgba(139,92,246,0.3); }
+        .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #8b5cf6, #06b6d4, #ec4899); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .sidebar-nav { padding: 20px 0; }
         .nav-item {
             display: flex;
@@ -65,11 +87,12 @@
         }
         body.light .nav-item { color: #1e293b; }
         .nav-item:hover, .nav-item.active {
-            background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(6,182,212,0.15));
+            background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(6,182,212,0.2));
             opacity: 1;
             transform: translateX(5px);
+            border-left: 2px solid #8b5cf6;
         }
-        .sidebar-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 24px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 24px; border-top: 1px solid rgba(139,92,246,0.3); }
         /* Main Content */
         .main-content { margin-left: 280px; min-height: 100vh; padding: 20px 30px; }
         /* Top Bar */
@@ -82,49 +105,72 @@
             background: rgba(255,255,255,0.05);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(139,92,246,0.3);
             flex-wrap: wrap;
             gap: 15px;
         }
-        /* Language Selector */
+        /* Language Selector - Colorful with Flags */
+        .language-selector {
+            position: relative;
+            display: inline-block;
+        }
         .language-selector select {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 1px solid rgba(139,92,246,0.4);
+            background: linear-gradient(135deg, #1e293b, #2d3a5e);
+            border: 1px solid rgba(139, 92, 246, 0.5);
             color: #f8fafc;
-            padding: 8px 32px 8px 40px;
-            border-radius: 30px;
+            padding: 10px 40px 10px 45px;
+            border-radius: 40px;
             cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
             appearance: none;
+            -webkit-appearance: none;
+            backdrop-filter: blur(10px);
         }
         body.light .language-selector select {
             background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
             color: #1e293b;
+            border: 1px solid #8b5cf6;
         }
-        .language-selector::before {
-            content: '🌐';
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 14px;
+        .language-selector select:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+            border-color: #8b5cf6;
         }
+        .language-selector option {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 10px;
+        }
+        body.light .language-selector option {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+        /* Flag Icons */
+        .lang-en::before { content: "🇺🇸 "; }
+        .lang-bn::before { content: "🇧🇩 "; }
+        .lang-zh::before { content: "🇨🇳 "; }
         /* Theme Toggle */
         .theme-toggle {
-            background: none;
-            border: none;
+            background: rgba(139,92,246,0.2);
+            border: 1px solid rgba(139,92,246,0.3);
             color: white;
             font-size: 1.2rem;
             cursor: pointer;
             width: 40px;
             height: 40px;
             border-radius: 50%;
+            transition: all 0.2s;
         }
-        body.light .theme-toggle { color: #1e293b; }
+        body.light .theme-toggle { color: #1e293b; background: rgba(0,0,0,0.05); }
+        .theme-toggle:hover { transform: rotate(15deg); background: rgba(139,92,246,0.4); }
         /* Cards */
         .card {
             background: rgba(255,255,255,0.04);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid rgba(139,92,246,0.2);
             border-radius: 24px;
             padding: 24px;
             transition: all 0.3s;
@@ -133,9 +179,11 @@
             background: rgba(0,0,0,0.02);
             border: 1px solid rgba(0,0,0,0.08);
         }
-        .card:hover { transform: translateY(-4px); border-color: rgba(139,92,246,0.3); }
+        .card:hover { transform: translateY(-5px); border-color: #8b5cf6; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
         .btn-primary {
-            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            background: linear-gradient(135deg, #7c3aed, #06b6d4, #ec4899);
+            background-size: 200% 200%;
+            animation: gradient 3s ease infinite;
             border: none;
             padding: 12px 28px;
             border-radius: 30px;
@@ -143,10 +191,13 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            text-decoration: none;
-            display: inline-block;
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(124,58,237,0.3); }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(124,58,237,0.4); }
         /* Auth Pages */
         .auth-container {
             display: flex;
@@ -158,21 +209,17 @@
         .auth-card {
             background: rgba(15,23,42,0.95);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(139,92,246,0.3);
+            border: 1px solid rgba(139,92,246,0.4);
             border-radius: 32px;
             padding: 48px;
             width: 100%;
             max-width: 460px;
             margin: 20px;
         }
-        body.light .auth-card {
-            background: rgba(255,255,255,0.95);
-        }
-        .auth-header { text-align: center; margin-bottom: 32px; }
         .auth-icon {
             width: 70px;
             height: 70px;
-            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            background: linear-gradient(135deg, #7c3aed, #06b6d4, #ec4899);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -185,14 +232,14 @@
             align-items: center;
             gap: 12px;
             background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(139,92,246,0.3);
             border-radius: 16px;
             padding: 12px 18px;
             margin-bottom: 16px;
             transition: all 0.3s;
         }
-        .input-group:hover { border-color: #7c3aed; background: rgba(124,58,237,0.1); }
-        .input-group i { color: #7c3aed; font-size: 18px; width: 24px; }
+        .input-group:hover { border-color: #8b5cf6; background: rgba(124,58,237,0.1); }
+        .input-group i { color: #8b5cf6; font-size: 18px; }
         .input-group input {
             flex: 1;
             background: transparent;
@@ -201,7 +248,6 @@
             font-size: 15px;
             outline: none;
         }
-        body.light .input-group input { color: #1e293b; }
         .auth-btn {
             width: 100%;
             padding: 14px;
@@ -211,15 +257,9 @@
             color: white;
             font-weight: 600;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 8px;
+            transition: all 0.3s;
         }
         .auth-btn:hover { transform: translateY(-2px); gap: 12px; }
-        .auth-footer { text-align: center; margin-top: 24px; }
-        .auth-footer a { color: #8b5cf6; text-decoration: none; }
         /* Stats Grid */
         .stats-grid {
             display: grid;
@@ -228,13 +268,13 @@
             margin-bottom: 30px;
         }
         .stat-card {
-            background: rgba(255,255,255,0.04);
+            background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.05));
             border-radius: 20px;
             padding: 24px;
             text-align: center;
+            border: 1px solid rgba(139,92,246,0.2);
         }
-        body.light .stat-card { background: rgba(0,0,0,0.03); }
-        .stat-card i { font-size: 2rem; background: linear-gradient(135deg, #7c3aed, #06b6d4); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .stat-card i { font-size: 2rem; background: linear-gradient(135deg, #8b5cf6, #06b6d4); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .stat-card h3 { font-size: 1.8rem; margin-top: 10px; }
         /* Chat */
         .chat-container { max-width: 900px; margin: 0 auto; }
@@ -250,7 +290,7 @@
             line-height: 1.5;
         }
         .message.user .message-content { background: linear-gradient(135deg, #7c3aed, #06b6d4); border-bottom-right-radius: 5px; }
-        .message.assistant .message-content { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-bottom-left-radius: 5px; }
+        .message.assistant .message-content { background: rgba(255,255,255,0.08); border: 1px solid rgba(139,92,246,0.3); border-bottom-left-radius: 5px; }
         .chat-input-container {
             display: flex;
             gap: 12px;
@@ -258,130 +298,61 @@
             padding: 12px 20px;
             background: rgba(255,255,255,0.05);
             border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(139,92,246,0.3);
         }
         .chat-input-container input { flex: 1; background: transparent; border: none; color: white; outline: none; }
-        body.light .chat-input-container input { color: #1e293b; }
         .chat-input-container button { background: linear-gradient(135deg, #7c3aed, #06b6d4); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; color: white; }
-        .mic-btn { background: rgba(255,255,255,0.1) !important; }
-        /* About Page */
-        .about-section { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .profile-card {
-            background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.08));
-            border-radius: 32px;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .profile-image {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #7c3aed, #06b6d4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            overflow: hidden;
-        }
-        .profile-image img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-name { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
-        .profile-title { color: #8b5cf6; margin-bottom: 16px; }
-        .social-links { display: flex; justify-content: center; gap: 20px; margin-top: 24px; flex-wrap: wrap; }
-        .social-links a {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-decoration: none;
-            transition: all 0.2s;
-            font-size: 1.3rem;
-        }
-        .social-links a:hover { background: #7c3aed; transform: translateY(-3px); }
-        body.light .social-links a { color: #1e293b; background: rgba(0,0,0,0.05); }
-        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 30px; }
-        .info-card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 24px; text-align: center; }
-        .info-card i { font-size: 2rem; color: #8b5cf6; margin-bottom: 12px; }
-        /* Flashcards */
-        .flashcard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 30px; }
-        .flashcard {
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .flashcard:hover { transform: scale(1.02); background: rgba(124,58,237,0.2); }
-        .alert { padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; }
-        .alert-success { background: rgba(16,185,129,0.15); border-left: 3px solid #10b981; }
-        .alert-danger { background: rgba(239,68,68,0.15); border-left: 3px solid #ef4444; }
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.show { transform: translateX(0); }
             .main-content { margin-left: 0; }
-            .mobile-menu-btn { display: block; position: fixed; top: 20px; left: 20px; z-index: 101; background: #7c3aed; border: none; width: 45px; height: 45px; border-radius: 50%; color: white; font-size: 1.2rem; cursor: pointer; }
+            .mobile-menu-btn { display: block; position: fixed; top: 20px; left: 20px; z-index: 101; background: linear-gradient(135deg, #7c3aed, #06b6d4); border: none; width: 45px; height: 45px; border-radius: 50%; color: white; font-size: 1.2rem; cursor: pointer; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .auth-card { padding: 32px; margin: 16px; }
-            .profile-name { font-size: 1.5rem; }
         }
+        .alert { padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; }
+        .alert-success { background: rgba(16,185,129,0.15); border-left: 3px solid #10b981; }
+        .alert-danger { background: rgba(239,68,68,0.15); border-left: 3px solid #ef4444; }
     </style>
 </head>
 <body class="{{ 'dark' if session.get('dark_mode', True) else 'light' }}">
+    <div class="particles" id="particles"></div>
     <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
 
     {% if session.user_id %}
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header"><h2 class="logo"><i class="fas fa-brain"></i> EduMind Nexus</h2></div>
         <div class="sidebar-nav">
-            <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="{{ url_for('chat') }}" class="nav-item"><i class="fas fa-comments"></i> AI Chat</a>
-            <a href="{{ url_for('notes') }}" class="nav-item"><i class="fas fa-file-alt"></i> Notes</a>
-            <a href="{{ url_for('quiz') }}" class="nav-item"><i class="fas fa-question-circle"></i> Quiz</a>
-            <a href="{{ url_for('planner') }}" class="nav-item"><i class="fas fa-calendar-alt"></i> Planner</a>
-            <a href="{{ url_for('flashcards') }}" class="nav-item"><i class="fas fa-layer-group"></i> Flashcards</a>
-            <a href="{{ url_for('about') }}" class="nav-item"><i class="fas fa-user"></i> About</a>
-            <a href="{{ url_for('settings') }}" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+            <a href="{{ url_for('dashboard') }}" class="nav-item" data-key="dashboard"><i class="fas fa-tachometer-alt"></i> <span class="nav-text">Dashboard</span></a>
+            <a href="{{ url_for('chat') }}" class="nav-item" data-key="aiChat"><i class="fas fa-comments"></i> <span class="nav-text">AI Chat</span></a>
+            <a href="{{ url_for('notes') }}" class="nav-item" data-key="notes"><i class="fas fa-file-alt"></i> <span class="nav-text">Notes</span></a>
+            <a href="{{ url_for('quiz') }}" class="nav-item" data-key="quiz"><i class="fas fa-question-circle"></i> <span class="nav-text">Quiz</span></a>
+            <a href="{{ url_for('planner') }}" class="nav-item" data-key="planner"><i class="fas fa-calendar-alt"></i> <span class="nav-text">Planner</span></a>
+            <a href="{{ url_for('flashcards') }}" class="nav-item" data-key="flashcards"><i class="fas fa-layer-group"></i> <span class="nav-text">Flashcards</span></a>
+            <a href="{{ url_for('about') }}" class="nav-item" data-key="about"><i class="fas fa-user"></i> <span class="nav-text">About</span></a>
+            <a href="{{ url_for('settings') }}" class="nav-item" data-key="settings"><i class="fas fa-cog"></i> <span class="nav-text">Settings</span></a>
         </div>
-        <div class="sidebar-footer"><a href="{{ url_for('logout') }}" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a></div>
+        <div class="sidebar-footer"><a href="{{ url_for('logout') }}" class="nav-item" data-key="logout"><i class="fas fa-sign-out-alt"></i> <span class="nav-text">Logout</span></a></div>
     </div>
     {% endif %}
 
     <div class="main-content">
         <div class="top-bar">
-            <div>
+            <div><span><i class="fas fa-fire"></i> <span id="streakText">Streak</span>: {{ session.get('study_streak', 0) }} <span id="daysText">days</span></span></div>
+            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                 {% if session.user_id %}
-                <span><i class="fas fa-fire"></i> Streak: {{ session.get('study_streak', 0) }} days</span>
-                {% endif %}
-            </div>
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                {% if session.user_id %}
-                <div class="language-selector" style="position: relative;">
+                <div class="language-selector">
                     <select id="languageSelect">
-                        <option value="en">English</option>
-                        <option value="bn">বাংলা</option>
-                        <option value="zh">中文</option>
+                        <option value="en" class="lang-en">🇺🇸 English</option>
+                        <option value="bn" class="lang-bn">🇧🇩 বাংলা</option>
+                        <option value="zh" class="lang-zh">🇨🇳 中文</option>
                     </select>
                 </div>
                 <button onclick="toggleTheme()" class="theme-toggle">
                     <i class="fas {{ 'fa-sun' if session.get('dark_mode', True) else 'fa-moon' }}"></i>
                 </button>
-                <div class="user-menu" style="position: relative; cursor: pointer;">
-                    <i class="fas fa-user-circle" style="font-size: 1.5rem;"></i>
-                    <div class="user-menu-dropdown" style="position: absolute; top: 100%; right: 0; background: rgba(15,23,42,0.95); border-radius: 12px; padding: 10px; min-width: 180px; display: none;">
-                        <a href="{{ url_for('dashboard') }}" style="display: block; padding: 8px 12px; color: white; text-decoration: none;">Dashboard</a>
-                        <a href="{{ url_for('settings') }}" style="display: block; padding: 8px 12px; color: white; text-decoration: none;">Settings</a>
-                        <a href="{{ url_for('logout') }}" style="display: block; padding: 8px 12px; color: white; text-decoration: none;">Logout</a>
-                    </div>
+                <div class="user-menu" style="position: relative;">
+                    <i class="fas fa-user-circle" style="font-size: 1.8rem; cursor: pointer; background: linear-gradient(135deg, #8b5cf6, #06b6d4); border-radius: 50%;"></i>
                 </div>
                 {% endif %}
             </div>
@@ -399,23 +370,88 @@
     </div>
 
     <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('show');
-        }
-        document.querySelector('.user-menu')?.addEventListener('mouseenter', function(e) {
-            this.querySelector('.user-menu-dropdown').style.display = 'block';
-        });
-        document.querySelector('.user-menu')?.addEventListener('mouseleave', function(e) {
-            this.querySelector('.user-menu-dropdown').style.display = 'none';
-        });
+        // Translations
+        const translations = {
+            'en': {
+                'dashboard': 'Dashboard', 'aiChat': 'AI Chat', 'notes': 'Notes', 'quiz': 'Quiz',
+                'planner': 'Planner', 'flashcards': 'Flashcards', 'about': 'About', 'settings': 'Settings',
+                'logout': 'Logout', 'streak': 'Streak', 'days': 'days', 'welcome': 'Welcome',
+                'quickActions': 'Quick Actions', 'chatWithAI': 'Chat with AI', 'uploadNotes': 'Upload Notes',
+                'generateQuiz': 'Generate Quiz', 'createPlan': 'Create Plan', 'totalChats': 'AI Conversations',
+                'notesUploaded': 'Notes Uploaded', 'quizzesTaken': 'Quizzes Taken', 'flashcardsCreated': 'Flashcards'
+            },
+            'bn': {
+                'dashboard': 'ড্যাশবোর্ড', 'aiChat': 'এআই চ্যাট', 'notes': 'নোট', 'quiz': 'কুইজ',
+                'planner': 'প্ল্যানার', 'flashcards': 'ফ্ল্যাশকার্ড', 'about': 'সম্পর্কে', 'settings': 'সেটিংস',
+                'logout': 'লগআউট', 'streak': 'স্ট্রিক', 'days': 'দিন', 'welcome': 'স্বাগতম',
+                'quickActions': 'দ্রুত কর্ম', 'chatWithAI': 'এআই-এর সাথে চ্যাট', 'uploadNotes': 'নোট আপলোড',
+                'generateQuiz': 'কুইজ তৈরি', 'createPlan': 'প্ল্যান তৈরি', 'totalChats': 'এআই কথোপকথন',
+                'notesUploaded': 'নোট আপলোড', 'quizzesTaken': 'কুইজ সম্পন্ন', 'flashcardsCreated': 'ফ্ল্যাশকার্ড'
+            },
+            'zh': {
+                'dashboard': '仪表板', 'aiChat': 'AI聊天', 'notes': '笔记', 'quiz': '测验',
+                'planner': '计划表', 'flashcards': '抽认卡', 'about': '关于', 'settings': '设置',
+                'logout': '登出', 'streak': '连续学习', 'days': '天', 'welcome': '欢迎',
+                'quickActions': '快速操作', 'chatWithAI': '与AI聊天', 'uploadNotes': '上传笔记',
+                'generateQuiz': '生成测验', 'createPlan': '创建计划', 'totalChats': 'AI对话',
+                'notesUploaded': '上传的笔记', 'quizzesTaken': '完成的测验', 'flashcardsCreated': '抽认卡'
+            }
+        };
 
         let currentLang = localStorage.getItem('language') || 'en';
+
+        function updateUILanguage(lang) {
+            const t = translations[lang];
+            if(!t) return;
+
+            // Update sidebar navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                const key = item.getAttribute('data-key');
+                const span = item.querySelector('.nav-text');
+                if(span && t[key]) span.textContent = t[key];
+            });
+
+            // Update streak text
+            const streakSpan = document.getElementById('streakText');
+            const daysSpan = document.getElementById('daysText');
+            if(streakSpan && t['streak']) streakSpan.textContent = t['streak'];
+            if(daysSpan && t['days']) daysSpan.textContent = t['days'];
+
+            // Update page title if on specific pages
+            const pageTitle = document.querySelector('h1');
+            if(pageTitle && pageTitle.getAttribute('data-key') && t[pageTitle.getAttribute('data-key')]) {
+                pageTitle.textContent = t[pageTitle.getAttribute('data-key')];
+            }
+        }
+
         if(document.getElementById('languageSelect')) {
             document.getElementById('languageSelect').value = currentLang;
             document.getElementById('languageSelect').addEventListener('change', (e) => {
                 localStorage.setItem('language', e.target.value);
-                location.reload();
+                currentLang = e.target.value;
+                updateUILanguage(currentLang);
             });
+        }
+
+        // Particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            if(!container) return;
+            for(let i = 0; i < 50; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.width = Math.random() * 4 + 2 + 'px';
+                p.style.height = p.style.width;
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                p.style.animation = `float ${Math.random() * 20 + 10}s infinite`;
+                container.appendChild(p);
+            }
+        }
+        createParticles();
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
         }
 
         function toggleTheme() {
@@ -436,9 +472,7 @@
         }
 
         function startVoiceInput() {
-            let langCode = 'en-US';
-            if(currentLang === 'bn') langCode = 'bn-BD';
-            else if(currentLang === 'zh') langCode = 'zh-CN';
+            let langCode = currentLang === 'bn' ? 'bn-BD' : currentLang === 'zh' ? 'zh-CN' : 'en-US';
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = langCode;
             recognition.onresult = (event) => {
@@ -447,6 +481,9 @@
             };
             recognition.start();
         }
+
+        // Apply UI language on load
+        updateUILanguage(currentLang);
     </script>
 </body>
 </html>
