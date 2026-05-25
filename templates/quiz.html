@@ -1,6 +1,22 @@
 ﻿{% extends "base.html" %}
 {% block content %}
-<div><h1>📝 Quiz Generator</h1>
-<div class="card" style="margin-bottom:30px"><h3>Generate Quiz</h3><form method="POST"><div class="form-group"><label>Topic</label><input type="text" name="topic" placeholder="e.g., Python, ML, History" required></div><button type="submit" class="btn-primary">Generate</button></form></div>
-{% if quizzes %}<h3>Previous Quizzes</h3>{% for quiz in quizzes %}<div class="card" style="margin-bottom:15px"><div><h4>{{ quiz.title }}</h4><p>Score: {{ quiz.score }}/{{ quiz.total }} ({{ (quiz.score/quiz.total*100)|round }}%)</p><a href="{{ url_for('take_quiz', quiz_id=quiz.id) }}" class="btn-primary" style="padding:8px 20px">Take Quiz</a></div></div>{% endfor %}{% endif %}</div>
+<div>
+    <h1>📝 Quiz Generator</h1>
+    <div class="card" style="margin-bottom: 30px;">
+        <h3>Generate Quiz</h3>
+        <form method="POST">
+            <div class="form-group"><label>Topic</label><input type="text" name="topic" placeholder="e.g., Python, ML, History" required></div>
+            <button type="submit" class="btn-primary">Generate</button>
+        </form>
+    </div>
+    {% if quizzes %}
+    <h3>Previous Quizzes</h3>
+    {% for quiz in quizzes %}
+    <div class="card" style="margin-bottom: 15px;">
+        <div><h4>{{ quiz.title }}</h4><p>Score: {{ quiz.score }}/{{ quiz.total }} ({{ (quiz.score/quiz.total*100)|round }}%)</p>
+        <a href="{{ url_for('take_quiz', quiz_id=quiz.id) }}" class="btn-primary" style="padding: 8px 20px;">Take Quiz</a></div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
 {% endblock %}

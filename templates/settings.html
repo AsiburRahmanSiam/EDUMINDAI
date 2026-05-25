@@ -1,6 +1,8 @@
 ﻿{% extends "base.html" %}
 {% block content %}
-<div><h1>⚙️ Settings</h1>
-<div class="card"><h3>Preferences</h3><form method="POST"><div class="form-group"><label><input type="checkbox" name="dark_mode" {% if user.dark_mode %}checked{% endif %}> 🌙 Dark Mode</label></div><button type="submit" class="btn-primary">Save</button></form></div>
-<div class="card" style="margin-top:30px"><h3>Account</h3><p><strong>Username:</strong> {{ user.username }}</p><p><strong>Email:</strong> {{ user.email }}</p><p><strong>Member since:</strong> {{ user.created_at.strftime('%Y-%m-%d') }}</p></div></div>
+<div>
+    <h1>⚙️ Settings</h1>
+    <div class="card"><h3>Preferences</h3><form method="POST"><div class="form-group"><label><input type="checkbox" name="dark_mode" {% if user.dark_mode %}checked{% endif %}> 🌙 Dark Mode</label></div><button type="submit" class="btn-primary">Save</button></form></div>
+    <div class="card" style="margin-top: 30px;"><h3>Account</h3><p><strong>Username:</strong> {{ user.username }}</p><p><strong>Email:</strong> {{ user.email }}</p><p><strong>Member since:</strong> {{ user.created_at.strftime('%Y-%m-%d') }}</p></div>
+</div>
 {% endblock %}

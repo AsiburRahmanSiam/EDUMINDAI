@@ -1,5 +1,5 @@
 ﻿"""
-EduMind Nexus AI - Premium DeepSeek API Integration
+EduMind Nexus AI - Complete Project
 Final Year Project - Object-Oriented Technology
 """
 
@@ -22,7 +22,7 @@ from gtts import gTTS
 load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'edumind-nexus-secret-key-2026'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'edumind-nexus-secret-key-2026')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///edumind.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -31,6 +31,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs('static/images', exist_ok=True)
 os.makedirs('static/audio', exist_ok=True)
+os.makedirs('static/uploads', exist_ok=True)
 
 db = SQLAlchemy(app)
 
@@ -102,140 +103,78 @@ with app.app_context():
     db.create_all()
 
 # ============================================
-# PREMIUM DEEPSEEK API INTEGRATION
-# ✅ আপনার API Key বসানো হয়েছে
+# DEEPSEEK API INTEGRATION
 # ============================================
 
-DEEPSEEK_API_KEY = "sk-45fa51dbb02e4778add679db15f19357"
+DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', 'sk-45fa51dbb02e4778add679db15f19357')
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 
 def call_deepseek(prompt, system_hint=None):
-    """Premium DeepSeek API Call - High Quality Responses"""
-
-    if not DEEPSEEK_API_KEY or DEEPSEEK_API_KEY == "YOUR_PREMIUM_DEEPSEEK_API_KEY_HERE":
-        return "⚠️ Please add your Premium DeepSeek API Key in the code!"
+    if not DEEPSEEK_API_KEY:
+        return "⚠️ Please add your DeepSeek API Key."
 
     messages = []
     if system_hint:
         messages.append({"role": "system", "content": system_hint})
     messages.append({"role": "user", "content": prompt})
 
-    headers = {
-        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
-        "Content-Type": "application/json"
-    }
-
-    data = {
-        "model": "deepseek-chat",
-        "messages": messages,
-        "temperature": 0.7,
-        "max_tokens": 2000
-    }
+    headers = {"Authorization": f"Bearer {DEEPSEEK_API_KEY}", "Content-Type": "application/json"}
+    data = {"model": "deepseek-chat", "messages": messages, "temperature": 0.7, "max_tokens": 2000}
 
     try:
         response = requests.post(DEEPSEEK_API_URL, headers=headers, json=data, timeout=30)
         if response.status_code == 200:
             return response.json()['choices'][0]['message']['content']
-        else:
-            return f"⚠️ API Error: {response.status_code}"
+        return f"⚠️ API Error: {response.status_code}"
     except Exception as e:
         return f"⚠️ Connection Error: {str(e)}"
 
 
 def get_ai_response(message, language='en'):
-    """Get AI response from Premium DeepSeek"""
     lang_map = {'en': 'English', 'bn': 'Bangla', 'zh': 'Chinese'}
-    system_prompt = f"""You are EduMind Nexus AI, a professional study assistant. 
-    Reply in {lang_map.get(language, 'English')}. Be helpful, accurate, and detailed.
-    Use markdown for formatting. Provide examples when helpful."""
-
+    system_prompt = f"You are EduMind Nexus AI, a professional study assistant. Reply in {lang_map.get(language, 'English')}. Be helpful and detailed."
     return call_deepseek(message, system_prompt)
 
 
 def summarize_document(text, filename):
-    """AI summary of uploaded document"""
     prompt = f"""Analyze this document "{filename}" and provide:
-    1. Executive Summary (2-3 sentences)
+    1. Executive Summary
     2. Key Points (5-8 bullet points)
     3. Main Topics Covered
-    4. Important Terms with Definitions
-
-    Document Content:
-    {text[:4000]}"""
-
+    Content: {text[:4000]}"""
     return call_deepseek(prompt)
 
 
 def generate_quiz(topic, num_questions=5):
-    """Generate quiz using AI"""
-    prompt = f"""Generate {num_questions} multiple choice questions about "{topic}".
-    Return ONLY valid JSON in this exact format:
-    {{"questions": [
-        {{"q": "Question text here", "options": ["A) Option 1", "B) Option 2", "C) Option 3", "D) Option 4"], "answer": "A) Option 1"}}
-    ]}}
-    Make questions educational and challenging for college students."""
-
+    prompt = f"""Generate {num_questions} MCQs about "{topic}".
+    Return ONLY JSON: {{"questions": [{{"q": "Question", "options": ["A","B","C","D"], "answer": "A"}}]}}"""
     response = call_deepseek(prompt)
-
-    # Extract JSON
     match = re.search(r'\{.*\}', response, re.DOTALL)
     if match:
         try:
-            data = json.loads(match.group())
-            return data.get('questions', [])
+            return json.loads(match.group()).get('questions', [])
         except:
             pass
-
-    # Fallback
-    return [
-        {"q": f"What is {topic}?", "options": ["A) Definition", "B) History", "C) Application", "D) All of the above"],
-         "answer": "A) Definition"},
-        {"q": f"Why is {topic} important?",
-         "options": ["A) Reason 1", "B) Reason 2", "C) Reason 3", "D) All of the above"], "answer": "A) Reason 1"},
-    ]
+    return [{"q": f"What is {topic}?", "options": ["A) Definition", "B) History", "C) Application", "D) All"],
+             "answer": "A) Definition"}]
 
 
 def generate_study_plan(subjects, days):
-    """Generate study plan using AI"""
-    prompt = f"""Create a comprehensive {days}-day study plan for these subjects: {subjects}.
-
-    Please include:
-    1. Daily schedule with time slots
-    2. Break recommendations
-    3. Revision days
-    4. Study tips and techniques
-    5. Progress tracking method
-
-    Use markdown format with tables and emojis for better readability."""
-
+    prompt = f"""Create a {days}-day study plan for: {subjects}. Include daily schedule, breaks, and tips. Use markdown."""
     return call_deepseek(prompt)
 
 
 def generate_flashcards(topic, num_cards=8):
-    """Generate flashcards using AI"""
-    prompt = f"""Generate {num_cards} high-quality flashcards for studying "{topic}".
-
-    Return ONLY valid JSON in this format:
-    {{"cards": [
-        {{"front": "Question or term here", "back": "Answer or definition here"}}
-    ]}}
-
-    Make them educational and helpful for exam preparation."""
-
+    prompt = f"""Generate {num_cards} flashcards for "{topic}". Return ONLY JSON: {{"cards": [{{"front": "Q", "back": "A"}}]}}"""
     response = call_deepseek(prompt)
     match = re.search(r'\{.*\}', response, re.DOTALL)
     if match:
         try:
-            data = json.loads(match.group())
-            return data.get('cards', [])
+            return json.loads(match.group()).get('cards', [])
         except:
             pass
-
-    return [
-        {"front": f"What is {topic}?", "back": f"{topic} is an important subject to study."},
-        {"front": f"Key concepts of {topic}", "back": f"There are many important concepts in {topic}."},
-    ]
+    return [{"front": f"What is {topic}?", "back": f"{topic} is important to study."}]
 
 
 def allowed_file(filename):
@@ -262,10 +201,6 @@ def extract_text_from_file(filepath):
     return text.strip()
 
 
-# ============================================
-# AUTHENTICATION DECORATOR
-# ============================================
-
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -278,7 +213,7 @@ def login_required(f):
 
 
 # ============================================
-# ROUTES
+# AUTH ROUTES
 # ============================================
 
 @app.route('/')
@@ -294,15 +229,12 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
-
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
             session['username'] = user.username
             flash(f'Welcome back, {user.username}!', 'success')
             return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid email or password!', 'danger')
-
+        flash('Invalid email or password!', 'danger')
     return render_template('login.html')
 
 
@@ -312,19 +244,15 @@ def register():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
-
         if User.query.filter_by(email=email).first():
             flash('Email already registered!', 'danger')
             return redirect(url_for('register'))
-
         user = User(username=username, email=email)
         user.password_hash = generate_password_hash(password)
         db.session.add(user)
         db.session.commit()
-
         flash('Account created! Please login.', 'success')
         return redirect(url_for('login'))
-
     return render_template('register.html')
 
 
@@ -335,6 +263,10 @@ def logout():
     return redirect(url_for('login'))
 
 
+# ============================================
+# MAIN ROUTES
+# ============================================
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -344,13 +276,8 @@ def dashboard():
     total_quizzes = Quiz.query.filter_by(user_id=uid).count()
     total_flashcards = Flashcard.query.filter_by(user_id=uid).count()
     recent_chats = Chat.query.filter_by(user_id=uid).order_by(Chat.created_at.desc()).limit(5).all()
-
-    return render_template('dashboard.html',
-                           total_chats=total_chats,
-                           total_notes=total_notes,
-                           total_quizzes=total_quizzes,
-                           total_flashcards=total_flashcards,
-                           recent_chats=recent_chats)
+    return render_template('dashboard.html', total_chats=total_chats, total_notes=total_notes,
+                           total_quizzes=total_quizzes, total_flashcards=total_flashcards, recent_chats=recent_chats)
 
 
 @app.route('/chat')
@@ -366,17 +293,13 @@ def api_chat():
     data = request.get_json()
     message = data.get('message', '').strip()
     language = data.get('language', 'en')
-
     if not message:
         return jsonify({'error': 'Empty message'}), 400
-
     response = get_ai_response(message, language)
-
     uid = session['user_id']
     db.session.add(Chat(user_id=uid, role='user', content=message))
     db.session.add(Chat(user_id=uid, role='assistant', content=response))
     db.session.commit()
-
     return jsonify({'reply': response})
 
 
@@ -392,22 +315,18 @@ def clear_chat():
 @login_required
 def notes():
     uid = session['user_id']
-
     if request.method == 'POST':
         file = request.files.get('file')
         if not file:
             flash('No file selected!', 'danger')
             return redirect(url_for('notes'))
-
         if not allowed_file(file.filename):
             flash('Only PDF, DOCX, TXT files allowed!', 'danger')
             return redirect(url_for('notes'))
-
         filename = secure_filename(file.filename)
         unique_name = f"{uuid.uuid4().hex[:8]}_{filename}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_name)
         file.save(filepath)
-
         text = extract_text_from_file(filepath)
         if text:
             summary = summarize_document(text, filename)
@@ -415,13 +334,10 @@ def notes():
         else:
             summary = 'Could not extract text from this file.'
             flash('Could not extract text!', 'warning')
-
         note = Note(user_id=uid, filename=unique_name, original_name=filename, summary=summary)
         db.session.add(note)
         db.session.commit()
-
         return redirect(url_for('notes'))
-
     notes = Note.query.filter_by(user_id=uid).order_by(Note.created_at.desc()).all()
     return render_template('notes.html', notes=notes)
 
@@ -454,24 +370,19 @@ def delete_note(note_id):
 @login_required
 def quiz():
     uid = session['user_id']
-
     if request.method == 'POST':
         topic = request.form.get('topic', '').strip()
         if not topic:
             flash('Please enter a topic!', 'danger')
             return redirect(url_for('quiz'))
-
         questions = generate_quiz(topic)
-
         if questions:
             quiz = Quiz(user_id=uid, title=topic, questions=json.dumps(questions), total=len(questions))
             db.session.add(quiz)
             db.session.commit()
-            session['current_quiz'] = quiz.id
             return redirect(url_for('take_quiz', quiz_id=quiz.id))
         else:
             flash('Could not generate quiz. Try another topic!', 'warning')
-
     quizzes = Quiz.query.filter_by(user_id=uid).order_by(Quiz.created_at.desc()).all()
     return render_template('quiz.html', quizzes=quizzes)
 
@@ -482,7 +393,6 @@ def take_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     if quiz.user_id != session['user_id']:
         return redirect(url_for('quiz'))
-
     questions = json.loads(quiz.questions)
     return render_template('take_quiz.html', quiz=quiz, questions=questions)
 
@@ -493,21 +403,17 @@ def submit_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     if quiz.user_id != session['user_id']:
         return jsonify({'error': 'Unauthorized'}), 403
-
     data = request.get_json()
     answers = data.get('answers', {})
     questions = json.loads(quiz.questions)
-
     score = 0
     for i, q in enumerate(questions):
         user_answer = answers.get(str(i), '').strip()
         correct = q.get('answer', '').strip()
         if user_answer.lower() == correct.lower():
             score += 1
-
     quiz.score = score
     db.session.commit()
-
     return jsonify({'score': score, 'total': len(questions), 'percentage': (score / len(questions)) * 100})
 
 
@@ -518,13 +424,11 @@ def planner():
     if request.method == 'POST':
         subjects = request.form.get('subjects', '')
         days = request.form.get('days', '7')
-
         if subjects:
             plan = generate_study_plan(subjects, days)
             study_plan = StudyPlan(user_id=session['user_id'], title=f"Study Plan: {subjects[:50]}", plan_data=plan)
             db.session.add(study_plan)
             db.session.commit()
-
     study_plans = StudyPlan.query.filter_by(user_id=session['user_id']).order_by(StudyPlan.created_at.desc()).limit(
         5).all()
     return render_template('planner.html', plan=plan, study_plans=study_plans)
@@ -543,7 +447,6 @@ def flashcards():
                                       back=card.get('back', ''))
                 db.session.add(flashcard)
             db.session.commit()
-
     saved_cards = Flashcard.query.filter_by(user_id=session['user_id']).order_by(Flashcard.created_at.desc()).limit(
         20).all()
     return render_template('flashcards.html', cards=cards, saved_cards=saved_cards)
@@ -555,10 +458,8 @@ def text_to_speech():
     data = request.get_json()
     text = data.get('text', '').strip()
     lang = data.get('lang', 'en')
-
     if not text:
         return jsonify({'error': 'Empty text'}), 400
-
     lang_map = {'en': 'en', 'bn': 'bn', 'zh': 'zh-CN'}
     try:
         tts = gTTS(text=text[:500], lang=lang_map.get(lang, 'en'))
@@ -574,15 +475,46 @@ def text_to_speech():
 @login_required
 def settings():
     user = User.query.get(session['user_id'])
-
     if request.method == 'POST':
         dark_mode = request.form.get('dark_mode') == 'on'
         user.dark_mode = dark_mode
         db.session.commit()
         flash('Settings updated!', 'success')
-
     return render_template('settings.html', user=user)
 
+
+# ============================================
+# ABOUT ROUTE & PROFILE IMAGE UPLOAD
+# ============================================
+
+@app.route('/about')
+@login_required
+def about():
+    return render_template('about.html')
+
+
+@app.route('/api/upload_profile_image', methods=['POST'])
+@login_required
+def upload_profile_image():
+    if 'profile_image' not in request.files:
+        return jsonify({'success': False, 'error': 'No file'}), 400
+
+    file = request.files['profile_image']
+    if file.filename == '':
+        return jsonify({'success': False, 'error': 'No file selected'}), 400
+
+    filename = f"profile_{session['user_id']}.jpg"
+    filepath = os.path.join('static/uploads', filename)
+    os.makedirs('static/uploads', exist_ok=True)
+    file.save(filepath)
+    session['user_profile_image'] = filename
+
+    return jsonify({'success': True, 'image_url': f'/static/uploads/{filename}'})
+
+
+# ============================================
+# RUN APP
+# ============================================
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

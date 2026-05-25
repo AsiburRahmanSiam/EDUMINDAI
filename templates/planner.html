@@ -1,6 +1,17 @@
 ﻿{% extends "base.html" %}
 {% block content %}
-<div><h1>📅 Study Planner</h1>
-<div class="card" style="margin-bottom:30px"><h3>Create Plan</h3><form method="POST"><div class="form-group"><label>Subjects</label><input type="text" name="subjects" placeholder="Math, Physics, English" required></div><div class="form-group"><label>Days</label><input type="number" name="days" value="7"></div><button type="submit" class="btn-primary">Generate Plan</button></form></div>
-{% if plan %}<div class="card"><h3>Your Study Plan</h3><div style="margin-top:20px">{{ plan | safe }}</div></div>{% endif %}</div>
+<div>
+    <h1>📅 Study Planner</h1>
+    <div class="card" style="margin-bottom: 30px;">
+        <h3>Create Plan</h3>
+        <form method="POST">
+            <div class="form-group"><label>Subjects</label><input type="text" name="subjects" placeholder="Math, Physics, English" required></div>
+            <div class="form-group"><label>Days</label><input type="number" name="days" value="7"></div>
+            <button type="submit" class="btn-primary">Generate Plan</button>
+        </form>
+    </div>
+    {% if plan %}
+    <div class="card"><h3>Your Study Plan</h3><div style="margin-top: 20px;">{{ plan | safe }}</div></div>
+    {% endif %}
+</div>
 {% endblock %}

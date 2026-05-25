@@ -1,9 +1,43 @@
 ﻿{% extends "base.html" %}
 {% block content %}
-<div><h1>Quiz: {{ quiz.title }}</h1>
-<form id="quizForm">{% for q in questions %}<div class="card" style="margin-bottom:20px"><p><strong>Q{{ loop.index }}: {{ q.q }}</strong></p>{% for opt in q.options %}<label style="display:block; margin:8px 0"><input type="radio" name="q{{ loop.index0 }}" value="{{ opt }}"> {{ opt }}</label>{% endfor %}</div>{% endfor %}<button type="button" onclick="submitQuiz()" class="btn-primary">Submit</button></form>
-<div id="result" style="display:none" class="card" style="margin-top:30px; text-align:center"><h2>Score: <span id="score"></span>/<span id="total"></span></h2><h3><span id="percent"></span>%</h3><a href="{{ url_for('quiz') }}" class="btn-primary">New Quiz</a></div></div>
+<div>
+    <h1>Quiz: {{ quiz.title }}</h1>
+    <form id="quizForm">
+        {% for q in questions %}
+        <div class="card" style="margin-bottom: 20px;">
+            <p><strong>Q{{ loop.index }}: {{ q.q }}</strong></p>
+            {% for opt in q.options %}
+            <label style="display: block; margin: 8px 0;"><input type="radio" name="q{{ loop.index0 }}" value="{{ opt }}"> {{ opt }}</label>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button type="button" onclick="submitQuiz()" class="btn-primary">Submit</button>
+    </form>
+    <div id="result" style="display: none;" class="card" style="margin-top: 30px; text-align: center;">
+        <h2>Score: <span id="score"></span>/<span id="total"></span></h2>
+        <h3><span id="percent"></span>%</h3>
+        <a href="{{ url_for('quiz') }}" class="btn-primary">New Quiz</a>
+    </div>
+</div>
+
 <script>
-async function submitQuiz(){const answers={};{% for q in questions %}const sel=document.querySelector(`input[name="q{{ loop.index0 }}"]:checked`);answers['{{ loop.index0 }}']=sel?sel.value:'';{% endfor %}const res=await fetch('/api/quiz/submit/{{ quiz.id }}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({answers})});const data=await res.json();document.getElementById('score').innerText=data.score;document.getElementById('total').innerText=data.total;document.getElementById('percent').innerText=data.percentage.toFixed(1);document.getElementById('result').style.display='block';document.getElementById('quizForm').style.display='none';}
+async function submitQuiz() {
+    const answers = {};
+    {% for q in questions %}
+    const sel = document.querySelector(`input[name="q{{ loop.index0 }}"]:checked`);
+    answers['{{ loop.index0 }}'] = sel ? sel.value : '';
+    {% endfor %}
+    const res = await fetch('/api/quiz/submit/{{ quiz.id }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers })
+    });
+    const data = await res.json();
+    document.getElementById('score').innerText = data.score;
+    document.getElementById('total').innerText = data.total;
+    document.getElementById('percent').innerText = data.percentage.toFixed(1);
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('quizForm').style.display = 'none';
+}
 </script>
 {% endblock %}
