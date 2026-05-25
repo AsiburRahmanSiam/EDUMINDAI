@@ -4,7 +4,6 @@
     <h1>⚙️ Settings</h1>
     <p style="opacity: 0.7; margin-bottom: 30px;">Customize your experience</p>
 
-    <!-- Profile Picture Upload Section -->
     <div class="card" style="margin-bottom: 30px;">
         <h3>Profile Picture</h3>
         <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
@@ -16,11 +15,10 @@
                 {% endif %}
             </div>
             <div>
-                <form id="profileImageForm" action="{{ url_for('upload_profile_image') }}" method="POST" enctype="multipart/form-data">
+                <form id="profileImageForm" method="POST" enctype="multipart/form-data">
                     <input type="file" name="profile_image" id="profileImageInput" accept="image/*" style="display: none;">
                     <button type="button" onclick="document.getElementById('profileImageInput').click()" class="btn-primary">Upload Photo</button>
                 </form>
-                <p style="font-size: 12px; opacity: 0.7; margin-top: 8px;">Upload your profile picture</p>
             </div>
         </div>
     </div>
@@ -40,10 +38,10 @@
 
     <div class="card" style="margin-bottom: 30px;">
         <h3>Account Information</h3>
-        <p><strong>Username:</strong> {{ user.username if user else 'N/A' }}</p>
-        <p><strong>Email:</strong> {{ user.email if user else 'N/A' }}</p>
-        <p><strong>Member since:</strong> {% if user and user.created_at %}{{ user.created_at.strftime('%Y-%m-%d') }}{% else %}Just joined{% endif %}</p>
-        <p><strong>Study Streak:</strong> {{ user.study_streak if user else 0 }} days 🔥</p>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Member since:</strong> {{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'Just joined' }}</p>
+        <p><strong>Study Streak:</strong> {{ user.study_streak }} days 🔥</p>
     </div>
 
     <div class="card" style="border-color: #ef4444;">
@@ -58,19 +56,16 @@
 </div>
 
 <script>
-    document.getElementById('profileImageInput').addEventListener('change', async function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const formData = new FormData();
-            formData.append('profile_image', file);
-            const response = await fetch('/api/upload_profile_image', { method: 'POST', body: formData });
-            const data = await response.json();
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Failed to upload image');
-            }
-        }
-    });
+document.getElementById('profileImageInput').addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const formData = new FormData();
+        formData.append('profile_image', file);
+        const response = await fetch('/api/upload_profile_image', { method: 'POST', body: formData });
+        const data = await response.json();
+        if (data.success) location.reload();
+        else alert('Failed to upload image');
+    }
+});
 </script>
 {% endblock %}

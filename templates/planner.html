@@ -1,17 +1,39 @@
 ﻿{% extends "base.html" %}
 {% block content %}
 <div>
-    <h1>📅 Study Planner</h1>
+    <h1>📅 AI Study Planner</h1>
+    <p style="opacity: 0.7; margin-bottom: 30px;">Get personalized AI-generated study plans</p>
+
     <div class="card" style="margin-bottom: 30px;">
-        <h3>Create Plan</h3>
+        <h3>Create Your Study Plan</h3>
         <form method="POST">
-            <div class="form-group"><label>Subjects</label><input type="text" name="subjects" placeholder="Math, Physics, English" required></div>
-            <div class="form-group"><label>Days</label><input type="number" name="days" value="7"></div>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>Subjects (comma separated)</label>
+                <input type="text" name="subjects" placeholder="Mathematics, Physics, English, Computer Science" required style="width:100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: white; margin-top: 8px;">
+            </div>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>Number of Days</label>
+                <input type="number" name="days" value="7" min="1" max="30" style="width:100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: white; margin-top: 8px;">
+            </div>
             <button type="submit" class="btn-primary">Generate Plan</button>
         </form>
     </div>
+
     {% if plan %}
-    <div class="card"><h3>Your Study Plan</h3><div style="margin-top: 20px;">{{ plan | safe }}</div></div>
+    <div class="card">
+        <h3>📖 Your Personalized Study Plan</h3>
+        <div style="margin-top: 20px; line-height: 1.8;">{{ plan | safe }}</div>
+    </div>
+    {% endif %}
+
+    {% if study_plans %}
+    <h3 style="margin: 30px 0 20px;">Previous Plans</h3>
+    {% for sp in study_plans %}
+    <div class="card" style="margin-bottom: 15px;">
+        <h4>{{ sp.title }}</h4>
+        <small>{{ sp.created_at.strftime('%Y-%m-%d') }}</small>
+    </div>
+    {% endfor %}
     {% endif %}
 </div>
 {% endblock %}

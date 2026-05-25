@@ -1,29 +1,53 @@
 ﻿{% extends "base.html" %}
 {% block content %}
 <div>
-    <h1>🎴 Flashcards</h1>
+    <h1>🎴 AI Flashcards</h1>
+    <p style="opacity: 0.7; margin-bottom: 30px;">Generate interactive flashcards for effective learning</p>
+
     <div class="card" style="margin-bottom: 30px;">
-        <h3>Generate</h3>
+        <h3>Generate Flashcards</h3>
         <form method="POST">
-            <div class="form-group"><input type="text" name="topic" placeholder="Enter topic..." required></div>
-            <button type="submit" class="btn-primary">Generate</button>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>Enter a topic</label>
+                <input type="text" name="topic" placeholder="e.g., Python Functions, World Capitals, Biology Terms" required style="width:100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: white; margin-top: 8px;">
+            </div>
+            <button type="submit" class="btn-primary">Generate Flashcards</button>
         </form>
     </div>
+
     {% if cards %}
     <h3>New Flashcards</h3>
     <div class="flashcard-grid">
         {% for card in cards %}
-        <div class="flashcard" onclick="this.classList.toggle('flipped')"><div><strong>{{ card.front }}</strong><hr><span>{{ card.back }}</span></div></div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+            <div>
+                <strong>{{ card.front }}</strong>
+                <hr style="margin: 15px 0;">
+                <span>{{ card.back }}</span>
+            </div>
+        </div>
         {% endfor %}
     </div>
     {% endif %}
+
     {% if saved_cards %}
-    <h3>Saved Flashcards</h3>
+    <h3 style="margin: 40px 0 20px;">Saved Flashcards</h3>
     <div class="flashcard-grid">
         {% for card in saved_cards %}
-        <div class="flashcard" onclick="this.classList.toggle('flipped')"><div><strong>{{ card.front }}</strong><hr><span>{{ card.back }}</span></div></div>
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+            <div>
+                <strong>{{ card.front }}</strong>
+                <hr style="margin: 15px 0;">
+                <span>{{ card.back }}</span>
+            </div>
+        </div>
         {% endfor %}
     </div>
     {% endif %}
 </div>
+
+<style>
+.flashcard.flipped div { transform: rotateY(180deg); }
+.flashcard div { transition: transform 0.3s; backface-visibility: hidden; }
+</style>
 {% endblock %}

@@ -9,8 +9,7 @@
             <h2>Welcome Back</h2>
             <p>Login to continue your learning journey</p>
         </div>
-
-        <form method="POST" class="auth-form">
+        <form method="POST">
             <div class="input-group">
                 <i class="fas fa-envelope"></i>
                 <input type="email" name="email" placeholder="Email address" required>
@@ -24,96 +23,10 @@
                 <i class="fas fa-arrow-right"></i>
             </button>
         </form>
-
         <div class="auth-footer">
             <p><a href="{{ url_for('forgot_password') }}">Forgot password?</a></p>
             <p>Don't have an account? <a href="{{ url_for('register') }}">Create one</a></p>
         </div>
     </div>
 </div>
-
-<style>
-.auth-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 85vh;
-}
-.auth-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 32px;
-    padding: 48px;
-    width: 460px;
-}
-.auth-header {
-    text-align: center;
-    margin-bottom: 32px;
-}
-.auth-icon {
-    width: 70px;
-    height: 70px;
-    background: linear-gradient(135deg, #7c3aed, #06b6d4);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-}
-.auth-icon i { font-size: 32px; color: white; }
-.auth-header h2 {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, var(--text), #a78bfa);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-.auth-header p { color: var(--gray); font-size: 14px; }
-.input-group {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 12px 18px;
-    margin-bottom: 16px;
-    transition: all 0.3s ease;
-}
-.input-group:hover { border-color: #7c3aed; background: rgba(124, 58, 237, 0.1); }
-.input-group i { color: #7c3aed; font-size: 18px; width: 24px; }
-.input-group input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: var(--text);
-    font-size: 15px;
-    outline: none;
-}
-.auth-btn {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, #7c3aed, #06b6d4);
-    border: none;
-    border-radius: 30px;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    margin-top: 8px;
-}
-.auth-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4); gap: 12px; }
-.auth-footer { text-align: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
-.auth-footer p { color: var(--gray); font-size: 14px; margin: 8px 0; }
-.auth-footer a { color: #8b5cf6; text-decoration: none; font-weight: 600; }
-@media (max-width: 768px) { .auth-card { width: 90%; padding: 32px; } }
-</style>
 {% endblock %}

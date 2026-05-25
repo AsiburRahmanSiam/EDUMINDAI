@@ -2,19 +2,30 @@
 {% block content %}
 <div>
     <h1>📝 Quiz Generator</h1>
+    <p style="opacity: 0.7; margin-bottom: 30px;">Generate AI-powered quizzes on any topic</p>
+
     <div class="card" style="margin-bottom: 30px;">
-        <h3>Generate Quiz</h3>
+        <h3>Generate New Quiz</h3>
         <form method="POST">
-            <div class="form-group"><label>Topic</label><input type="text" name="topic" placeholder="e.g., Python, ML, History" required></div>
-            <button type="submit" class="btn-primary">Generate</button>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>Enter a topic</label>
+                <input type="text" name="topic" placeholder="e.g., Python, Machine Learning, History" required style="width:100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: white; margin-top: 8px;">
+            </div>
+            <button type="submit" class="btn-primary">Generate Quiz</button>
         </form>
     </div>
+
     {% if quizzes %}
     <h3>Previous Quizzes</h3>
     {% for quiz in quizzes %}
     <div class="card" style="margin-bottom: 15px;">
-        <div><h4>{{ quiz.title }}</h4><p>Score: {{ quiz.score }}/{{ quiz.total }} ({{ (quiz.score/quiz.total*100)|round }}%)</p>
-        <a href="{{ url_for('take_quiz', quiz_id=quiz.id) }}" class="btn-primary" style="padding: 8px 20px;">Take Quiz</a></div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h4>{{ quiz.title }}</h4>
+                <p>Score: {{ quiz.score }}/{{ quiz.total }} ({{ (quiz.score/quiz.total*100)|round }}%)</p>
+            </div>
+            <a href="{{ url_for('take_quiz', quiz_id=quiz.id) }}" class="btn-primary" style="padding: 8px 20px;">Take Quiz</a>
+        </div>
     </div>
     {% endfor %}
     {% endif %}

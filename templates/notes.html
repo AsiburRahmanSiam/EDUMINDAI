@@ -4,7 +4,6 @@
     <h1>📄 Notes Manager</h1>
     <p style="opacity: 0.7; margin-bottom: 30px;">Upload, search, and manage your study notes</p>
 
-    <!-- Upload Section -->
     <div class="card" style="margin-bottom: 30px;">
         <h3>Upload New Note</h3>
         <form method="POST" enctype="multipart/form-data">
@@ -13,16 +12,12 @@
         </form>
     </div>
 
-    <!-- Search Section -->
-    <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="🔍 Search notes..." value="{{ search }}">
+    <div class="search-bar" style="display: flex; gap: 12px; margin-bottom: 20px;">
+        <input type="text" id="searchInput" placeholder="🔍 Search notes..." value="{{ search }}" style="flex:1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; color: white;">
         <button onclick="searchNotes()" class="btn-primary">Search</button>
-        {% if search %}
-        <a href="{{ url_for('notes') }}" class="btn-primary" style="background: #64748b;">Clear</a>
-        {% endif %}
+        {% if search %}<a href="{{ url_for('notes') }}" class="btn-primary" style="background: #64748b;">Clear</a>{% endif %}
     </div>
 
-    <!-- Notes List -->
     {% if notes %}
     <h3>Your Notes ({{ notes|length }})</h3>
     {% for note in notes %}
@@ -31,11 +26,11 @@
             <div>
                 <h4>{{ note.original_name }}</h4>
                 <small>{{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
-                <p style="margin-top: 10px; opacity: 0.8;">{{ note.summary[:200] }}...</p>
+                <p style="margin-top: 10px;">{{ note.summary[:200] }}...</p>
             </div>
             <div style="display: flex; gap: 10px;">
-                <a href="{{ url_for('view_note', note_id=note.id) }}" class="btn-primary" style="padding: 8px 16px; font-size: 0.9rem;">View</a>
-                <a href="{{ url_for('export_note_pdf', note_id=note.id) }}" class="btn-primary" style="padding: 8px 16px; font-size: 0.9rem; background: #10b981;">📄 PDF</a>
+                <a href="{{ url_for('view_note', note_id=note.id) }}" class="btn-primary" style="padding: 8px 16px;">View</a>
+                <a href="{{ url_for('export_note_pdf', note_id=note.id) }}" class="btn-primary" style="padding: 8px 16px; background: #10b981;">📄 PDF</a>
                 <form method="POST" action="{{ url_for('delete_note', note_id=note.id) }}" style="display: inline;">
                     <button type="submit" style="background: #ef4444; border: none; padding: 8px 16px; border-radius: 30px; color: white; cursor: pointer;">Delete</button>
                 </form>
@@ -53,12 +48,9 @@
 
 <script>
 function searchNotes() {
-    const searchTerm = document.getElementById('searchInput').value;
-    if(searchTerm) {
-        window.location.href = "{{ url_for('notes') }}?search=" + encodeURIComponent(searchTerm);
-    } else {
-        window.location.href = "{{ url_for('notes') }}";
-    }
+    const term = document.getElementById('searchInput').value;
+    if(term) window.location.href = "{{ url_for('notes') }}?search=" + encodeURIComponent(term);
+    else window.location.href = "{{ url_for('notes') }}";
 }
 </script>
 {% endblock %}

@@ -1,6 +1,6 @@
 ﻿"""
 EduMind Nexus AI - Complete Version with All Features
-Deployment Ready for Render.com with PostgreSQL Support
+Deployment Ready for Render.com
 """
 
 import os
@@ -20,9 +20,9 @@ import docx
 from gtts import gTTS
 from io import BytesIO
 
-# Try to import weasyprint, but don't fail if not available
+# WeasyPrint for PDF export
 try:
-    import weasyprint
+    from weasyprint import HTML
     WEASYPRINT_AVAILABLE = True
 except ImportError:
     WEASYPRINT_AVAILABLE = False
@@ -116,6 +116,10 @@ class StudyPlan(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+with app.app_context():
+    db.create_all()
+
+
 # ============================================
 # UPDATE STUDY STREAK DECORATOR
 # ============================================
@@ -136,7 +140,6 @@ def update_study_streak(f):
                 db.session.commit()
                 session['study_streak'] = user.study_streak
         return f(*args, **kwargs)
-
     return decorated
 
 
@@ -213,22 +216,6 @@ print('Hello, World!')
 - Recommendation systems
 - Self-driving cars"""
 
-    elif 'zhengzhou university' in prompt_lower:
-        return """**Zhengzhou University (郑州大学)** is a prestigious public university in Zhengzhou, Henan, China.
-
-**Key Information:**
-- **Founded:** 1956
-- **Type:** Public research university
-- **Students:** 70,000+
-- **Ranking:** Among top 100 universities in China
-- **Member of Project 211**
-
-**Notable Programs:**
-- Medicine
-- Engineering
-- Materials Science
-- Chemistry"""
-
     else:
         return """I'm EduMind Nexus AI, your intelligent study assistant! 📚
 
@@ -237,12 +224,10 @@ print('Hello, World!')
 - Data Science & Machine Learning
 - Science, Mathematics, History
 - Exam preparation & study techniques
-- Career guidance & interviews
 
 **Try asking me:**
 - "What is Python?"
 - "Explain machine learning"
-- "What is Zhengzhou University?"
 - "How to study effectively?"
 
 How can I help you today? 🚀"""
@@ -288,39 +273,20 @@ def generate_quiz(topic, num_questions=5):
          "answer": "A) Definition"},
         {"q": f"Why is {topic} important?",
          "options": ["A) Reason 1", "B) Reason 2", "C) Reason 3", "D) All of the above"], "answer": "A) Reason 1"},
-        {"q": f"Key concept in {topic}", "options": ["A) Concept A", "B) Concept B", "C) Concept C", "D) Concept D"],
-         "answer": "A) Concept A"},
-        {"q": f"Application of {topic}",
-         "options": ["A) Application 1", "B) Application 2", "C) Application 3", "D) Application 4"],
-         "answer": "A) Application 1"},
-        {"q": f"Future of {topic}",
-         "options": ["A) Future trend 1", "B) Future trend 2", "C) Future trend 3", "D) Future trend 4"],
-         "answer": "A) Future trend 1"}
     ][:num_questions]
 
 
 def generate_study_plan(subjects, days):
     """Generate study plan using AI"""
     prompt = f"""Create a comprehensive {days}-day study plan for these subjects: {subjects}.
-
-    Include:
-    1. Daily schedule with time slots
-    2. Break recommendations
-    3. Revision days
-    4. Study tips
-
-    Use markdown format with emojis."""
+    Include daily schedule, break times, revision days, and study tips."""
     return call_deepseek(prompt)
 
 
 def generate_flashcards(topic, num_cards=8):
     """Generate flashcards using AI"""
     prompt = f"""Generate {num_cards} flashcards for studying "{topic}".
-
-    Return ONLY JSON in this format:
-    {{"cards": [
-        {{"front": "Question/term", "back": "Answer/definition"}}
-    ]}}"""
+    Return ONLY JSON: {{"cards": [{{"front": "Question", "back": "Answer"}}]}}"""
 
     response = call_deepseek(prompt)
     match = re.search(r'\{.*\}', response, re.DOTALL)
@@ -329,14 +295,7 @@ def generate_flashcards(topic, num_cards=8):
             return json.loads(match.group()).get('cards', [])
         except:
             pass
-
-    # Fallback flashcards
-    return [
-        {"front": f"What is {topic}?", "back": f"{topic} is an important subject to study."},
-        {"front": f"Key concepts of {topic}", "back": f"There are many important concepts in {topic}."},
-        {"front": f"Applications of {topic}", "back": f"{topic} has many real-world applications."},
-        {"front": f"Why study {topic}?", "back": f"Understanding {topic} opens many career opportunities."},
-    ][:num_cards]
+    return [{"front": f"What is {topic}?", "back": f"{topic} is an important subject."}]
 
 
 def allowed_file(filename):
@@ -370,7 +329,6 @@ def login_required(f):
             flash('Please login first!', 'warning')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
-
     return decorated
 
 
@@ -391,7 +349,6 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
-
         if user and check_password_hash(user.password_hash, password):
             session.permanent = True
             session['user_id'] = user.id
@@ -402,7 +359,6 @@ def login():
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid email or password!', 'danger')
-
     return render_template('login.html')
 
 
@@ -412,19 +368,15 @@ def register():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
-
         if User.query.filter_by(email=email).first():
             flash('Email already registered!', 'danger')
             return redirect(url_for('register'))
-
         user = User(username=username, email=email)
         user.password_hash = generate_password_hash(password)
         db.session.add(user)
         db.session.commit()
-
         flash('Account created! Please login.', 'success')
         return redirect(url_for('login'))
-
     return render_template('register.html')
 
 
@@ -473,7 +425,6 @@ def reset_password(token):
     if not user:
         flash('Invalid or expired token!', 'danger')
         return redirect(url_for('login'))
-
     if request.method == 'POST':
         password = request.form.get('password')
         user.password_hash = generate_password_hash(password)
@@ -481,7 +432,6 @@ def reset_password(token):
         db.session.commit()
         flash('Password reset successfully! Please login.', 'success')
         return redirect(url_for('login'))
-
     return render_template('reset_password.html')
 
 
@@ -509,19 +459,11 @@ def dashboard():
     total_notes = Note.query.filter_by(user_id=uid).count()
     total_quizzes = Quiz.query.filter_by(user_id=uid).count()
     total_flashcards = Flashcard.query.filter_by(user_id=uid).count()
-
-    # Quiz data for chart
-    quizzes = Quiz.query.filter_by(user_id=uid).all()
-    quiz_labels = [q.title[:15] for q in quizzes[-5:]]
-    quiz_percentages = [(q.score / q.total * 100) if q.total > 0 else 0 for q in quizzes[-5:]]
-
     return render_template('dashboard.html',
                            total_chats=total_chats,
                            total_notes=total_notes,
                            total_quizzes=total_quizzes,
-                           total_flashcards=total_flashcards,
-                           quiz_labels=quiz_labels,
-                           quiz_percentages=quiz_percentages)
+                           total_flashcards=total_flashcards)
 
 
 @app.route('/chat')
@@ -538,17 +480,13 @@ def api_chat():
     data = request.get_json()
     message = data.get('message', '').strip()
     language = data.get('language', 'en')
-
     if not message:
         return jsonify({'error': 'Empty message'}), 400
-
     response = get_ai_response(message, language)
-
     uid = session['user_id']
     db.session.add(Chat(user_id=uid, role='user', content=message))
     db.session.add(Chat(user_id=uid, role='assistant', content=response))
     db.session.commit()
-
     return jsonify({'reply': response})
 
 
@@ -565,22 +503,18 @@ def clear_chat():
 @update_study_streak
 def notes():
     uid = session['user_id']
-
     if request.method == 'POST':
         file = request.files.get('file')
         if not file:
             flash('No file selected!', 'danger')
             return redirect(url_for('notes'))
-
         if not allowed_file(file.filename):
             flash('Only PDF, DOCX, TXT files allowed!', 'danger')
             return redirect(url_for('notes'))
-
         filename = secure_filename(file.filename)
         unique_name = f"{uuid.uuid4().hex[:8]}_{filename}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_name)
         file.save(filepath)
-
         text = extract_text_from_file(filepath)
         if text:
             summary = summarize_document(text, filename)
@@ -588,19 +522,15 @@ def notes():
         else:
             summary = 'Could not extract text from this file.'
             flash('Could not extract text!', 'warning')
-
         note = Note(user_id=uid, filename=unique_name, original_name=filename, summary=summary)
         db.session.add(note)
         db.session.commit()
         return redirect(url_for('notes'))
-
     search = request.args.get('search', '')
     if search:
-        notes = Note.query.filter_by(user_id=uid).filter(Note.original_name.contains(search)).order_by(
-            Note.created_at.desc()).all()
+        notes = Note.query.filter_by(user_id=uid).filter(Note.original_name.contains(search)).order_by(Note.created_at.desc()).all()
     else:
         notes = Note.query.filter_by(user_id=uid).order_by(Note.created_at.desc()).all()
-
     return render_template('notes.html', notes=notes, search=search)
 
 
@@ -632,33 +562,21 @@ def delete_note(note_id):
 @login_required
 def export_note_pdf(note_id):
     if not WEASYPRINT_AVAILABLE:
-        flash('PDF export is not available on this server.', 'warning')
+        flash('PDF export is not available. Install weasyprint.', 'warning')
         return redirect(url_for('view_note', note_id=note_id))
-
     note = Note.query.get_or_404(note_id)
     if note.user_id != session['user_id']:
         return redirect(url_for('notes'))
-
     html_content = f"""
     <!DOCTYPE html>
     <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{note.original_name}</title>
-        <style>
-            body {{ font-family: Arial, sans-serif; padding: 40px; }}
-            h1 {{ color: #7c3aed; }}
-            .summary {{ line-height: 1.6; }}
-        </style>
+    <head><meta charset="UTF-8"><title>{note.original_name}</title>
+    <style>body {{ font-family: Arial; padding: 40px; }} h1 {{ color: #7c3aed; }}</style>
     </head>
-    <body>
-        <h1>{note.original_name}</h1>
-        <p><small>Generated on {datetime.now().strftime('%Y-%m-%d %H:%M')}</small></p>
-        <div class="summary">{note.summary | safe}</div>
-    </body>
-    </html>
+    <body><h1>{note.original_name}</h1><p><small>Generated on {datetime.now().strftime('%Y-%m-%d %H:%M')}</small></p>
+    <div>{note.summary | safe}</div></body></html>
     """
-    pdf = weasyprint.HTML(string=html_content).write_pdf()
+    pdf = HTML(string=html_content).write_pdf()
     return send_file(BytesIO(pdf), download_name=f"{note.original_name}.pdf", as_attachment=True)
 
 
@@ -667,15 +585,12 @@ def export_note_pdf(note_id):
 @update_study_streak
 def quiz():
     uid = session['user_id']
-
     if request.method == 'POST':
         topic = request.form.get('topic', '').strip()
         if not topic:
             flash('Please enter a topic!', 'danger')
             return redirect(url_for('quiz'))
-
         questions = generate_quiz(topic)
-
         if questions:
             quiz = Quiz(user_id=uid, title=topic, questions=json.dumps(questions), total=len(questions))
             db.session.add(quiz)
@@ -683,7 +598,6 @@ def quiz():
             return redirect(url_for('take_quiz', quiz_id=quiz.id))
         else:
             flash('Could not generate quiz. Try another topic!', 'warning')
-
     quizzes = Quiz.query.filter_by(user_id=uid).order_by(Quiz.created_at.desc()).all()
     return render_template('quiz.html', quizzes=quizzes)
 
@@ -694,7 +608,6 @@ def take_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     if quiz.user_id != session['user_id']:
         return redirect(url_for('quiz'))
-
     questions = json.loads(quiz.questions)
     return render_template('take_quiz.html', quiz=quiz, questions=questions)
 
@@ -705,34 +618,18 @@ def submit_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     if quiz.user_id != session['user_id']:
         return jsonify({'error': 'Unauthorized'}), 403
-
     data = request.get_json()
     answers = data.get('answers', {})
     questions = json.loads(quiz.questions)
-
     score = 0
     for i, q in enumerate(questions):
         user_answer = answers.get(str(i), '').strip()
         correct = q.get('answer', '').strip()
         if user_answer.lower() == correct.lower():
             score += 1
-
     quiz.score = score
     db.session.commit()
-
-    return jsonify({'score': score, 'total': len(questions), 'percentage': (score / len(questions)) * 100})
-
-
-@app.route('/api/quiz/share/<int:quiz_id>', methods=['POST'])
-@login_required
-def share_quiz(quiz_id):
-    quiz = Quiz.query.get_or_404(quiz_id)
-    if quiz.user_id != session['user_id']:
-        return jsonify({'error': 'Unauthorized'}), 403
-
-    quiz.shared = not quiz.shared
-    db.session.commit()
-    return jsonify({'shared': quiz.shared})
+    return jsonify({'score': score, 'total': len(questions), 'percentage': (score/len(questions))*100})
 
 
 @app.route('/planner', methods=['GET', 'POST'])
@@ -743,15 +640,12 @@ def planner():
     if request.method == 'POST':
         subjects = request.form.get('subjects', '')
         days = request.form.get('days', '7')
-
         if subjects:
             plan = generate_study_plan(subjects, days)
             study_plan = StudyPlan(user_id=session['user_id'], title=f"Study Plan: {subjects[:50]}", plan_data=plan)
             db.session.add(study_plan)
             db.session.commit()
-
-    study_plans = StudyPlan.query.filter_by(user_id=session['user_id']).order_by(StudyPlan.created_at.desc()).limit(
-        5).all()
+    study_plans = StudyPlan.query.filter_by(user_id=session['user_id']).order_by(StudyPlan.created_at.desc()).limit(5).all()
     return render_template('planner.html', plan=plan, study_plans=study_plans)
 
 
@@ -765,13 +659,10 @@ def flashcards():
         if topic:
             cards = generate_flashcards(topic)
             for card in cards:
-                flashcard = Flashcard(user_id=session['user_id'], topic=topic, front=card.get('front', ''),
-                                      back=card.get('back', ''))
+                flashcard = Flashcard(user_id=session['user_id'], topic=topic, front=card.get('front',''), back=card.get('back',''))
                 db.session.add(flashcard)
             db.session.commit()
-
-    saved_cards = Flashcard.query.filter_by(user_id=session['user_id']).order_by(Flashcard.created_at.desc()).limit(
-        20).all()
+    saved_cards = Flashcard.query.filter_by(user_id=session['user_id']).order_by(Flashcard.created_at.desc()).limit(20).all()
     return render_template('flashcards.html', cards=cards, saved_cards=saved_cards)
 
 
@@ -781,10 +672,8 @@ def text_to_speech():
     data = request.get_json()
     text = data.get('text', '').strip()
     lang = data.get('lang', 'en')
-
     if not text:
         return jsonify({'error': 'Empty text'}), 400
-
     lang_map = {'en': 'en', 'bn': 'bn', 'zh': 'zh-CN'}
     try:
         tts = gTTS(text=text[:500], lang=lang_map.get(lang, 'en'))
@@ -800,14 +689,12 @@ def text_to_speech():
 @login_required
 def settings():
     user = User.query.get(session['user_id'])
-
     if request.method == 'POST':
         dark_mode = request.form.get('dark_mode') == 'on'
         user.dark_mode = dark_mode
         session['dark_mode'] = dark_mode
         db.session.commit()
         flash('Settings updated!', 'success')
-
     return render_template('settings.html', user=user)
 
 
@@ -826,28 +713,24 @@ def about():
 def upload_profile_image():
     if 'profile_image' not in request.files:
         return jsonify({'success': False, 'error': 'No file'}), 400
-
     file = request.files['profile_image']
     if file.filename == '':
         return jsonify({'success': False, 'error': 'No file selected'}), 400
-
     filename = f"profile_{session['user_id']}.jpg"
     filepath = os.path.join('static/uploads', filename)
     os.makedirs('static/uploads', exist_ok=True)
     file.save(filepath)
     session['user_profile_image'] = filename
-
     return jsonify({'success': True, 'image_url': f'/static/uploads/{filename}'})
 
 
 # ============================================
-# RUN APP - Database will be recreated on each deploy
+# RUN APP
 # ============================================
 
 with app.app_context():
-    db.drop_all()
     db.create_all()
-    print("✅ Database recreated successfully!")
+    print("✅ Database tables created!")
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
