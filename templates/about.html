@@ -1,50 +1,296 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="about-section">
-    <div class="profile-card">
-        <div class="profile-image">
-            <img src="{{ url_for('static', filename='images/asibur-profile.jpg') }}" alt="Asibur Rahman Siam">
-        </div>
-        <h1 class="profile-name">Asibur Rahman Siam</h1>
-        <p class="profile-title">⭐ Software Engineering Student | AI Enthusiast | Creator of EduMind Nexus</p>
-        <p class="profile-bio">
-            A passionate Software Engineering student at Zhengzhou University, China.
-            I love building intelligent systems that make learning accessible and enjoyable for everyone.
-            EduMind Nexus is my vision of combining AI with education to create a smarter learning experience.
-        </p>
-        <div class="social-links">
-            <a href="https://github.com/AsiburRahmanSiam" target="_blank"><i class="fab fa-github"></i></a>
-            <a href="weixin://contacts/profile/_I_Am_Asibur_12_" target="_blank"><i class="fab fa-weixin"></i></a>
-            <a href="https://instagram.com/_im.asi_bur_12_" target="_blank"><i class="fab fa-instagram"></i></a>
+<div class="about-container">
+    <!-- Hero Section -->
+    <div class="about-hero">
+        <div class="about-hero-content">
+            <div class="about-avatar">
+                <img src="{{ url_for('static', filename='images/asibur-profile.jpg') }}" alt="Asibur Rahman Siam">
+            </div>
+            <h1 class="about-name">Asibur Rahman Siam</h1>
+            <p class="about-title">⭐ Software Engineering Student | AI Enthusiast | Creator of EduMind Nexus</p>
+            <p class="about-bio">
+                An enterprising student studying at <strong>Zhengzhou University</strong> in China.
+                EduMind Nexus is the result of combining my passion for software engineering with the power of artificial intelligence.
+                Built with <strong>Python, Flask, and AI</strong> — designed for learners, by a learner.
+            </p>
+            <div class="about-social">
+                <a href="https://github.com/AsiburRahmanSiam" target="_blank" class="social-link github"><i class="fab fa-github"></i> GitHub</a>
+                <a href="weixin://contacts/profile/_I_Am_Asibur_12_" target="_blank" class="social-link wechat"><i class="fab fa-weixin"></i> WeChat</a>
+                <a href="https://instagram.com/_im.asi_bur_12_" target="_blank" class="social-link instagram"><i class="fab fa-instagram"></i> Instagram</a>
+            </div>
         </div>
     </div>
 
-    <div class="info-grid">
-        <div class="info-card">
+    <!-- Stats Section -->
+    <div class="about-stats">
+        <div class="stat-item">
+            <div class="stat-number">10+</div>
+            <div class="stat-label">AI Features</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">3</div>
+            <div class="stat-label">Languages</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Availability</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Free</div>
+        </div>
+    </div>
+
+    <!-- Info Grid -->
+    <div class="about-grid">
+        <div class="about-card">
             <i class="fas fa-graduation-cap"></i>
             <h3>Education</h3>
             <p><strong>Software Engineering</strong><br>Zhengzhou University, China</p>
         </div>
-        <div class="info-card">
+        <div class="about-card">
             <i class="fas fa-code"></i>
             <h3>Skills</h3>
             <p>Python, Flask, AI/ML, JavaScript<br>Web Development, Cloud Computing</p>
         </div>
-        <div class="info-card">
+        <div class="about-card">
             <i class="fas fa-project-diagram"></i>
             <h3>Projects</h3>
-            <p>EduMind Nexus AI<br>Multimodal Study Assistant</p>
+            <p>✨ EduMind Nexus AI<br>✨ Multimodal Study Assistant</p>
         </div>
-        <div class="info-card">
+        <div class="about-card">
             <i class="fas fa-trophy"></i>
             <h3>Achievements</h3>
-            <p>Final Year Project<br>AI Innovation Award</p>
+            <p>🏆 Final Year Project<br>🏆 AI Innovation Award</p>
         </div>
     </div>
 
-    <div class="card" style="margin-top: 30px;">
+    <!-- Project Description -->
+    <div class="about-project">
         <h2><i class="fas fa-rocket"></i> About EduMind Nexus</h2>
-        <p style="margin-top: 16px;">EduMind Nexus AI is a cutting-edge, multimodal intelligent study assistant designed to revolutionize how students learn. Powered by DeepSeek's advanced AI, it offers AI Chatbot, PDF Summarization, Quiz Generation, Study Planner, Flashcards, Voice Input, and Text-to-Speech features.</p>
+        <p>
+            EduMind Nexus AI is a cutting-edge, multimodal intelligent study assistant designed to revolutionize how students learn.
+            Powered by DeepSeek's advanced AI, it offers AI Chatbot, PDF Summarization, Quiz Generation, Study Planner,
+            Flashcards, Voice Input, and Text-to-Speech features.
+        </p>
+        <p class="about-quote">
+            "Making learning smarter, faster, and accessible for everyone."
+        </p>
     </div>
 </div>
+
+<style>
+.about-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.about-hero {
+    background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.08));
+    border-radius: 32px;
+    padding: 48px;
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.about-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #06b6d4, #ec4899);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    overflow: hidden;
+    padding: 4px;
+}
+
+.about-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #0f172a;
+}
+
+.about-name {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #fff, #8b5cf6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+body.light .about-name {
+    background: linear-gradient(135deg, #1e293b, #7c3aed);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.about-title {
+    color: #8b5cf6;
+    margin-bottom: 16px;
+    font-size: 1rem;
+}
+
+.about-bio {
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+    opacity: 0.9;
+}
+
+.about-bio strong {
+    color: #8b5cf6;
+}
+
+.about-social {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    border-radius: 40px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.social-link.github {
+    background: #333;
+    color: white;
+}
+
+.social-link.wechat {
+    background: #07c160;
+    color: white;
+}
+
+.social-link.instagram {
+    background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+    color: white;
+}
+
+.social-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.about-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-item {
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+    border: 1px solid rgba(139,92,246,0.2);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.stat-label {
+    margin-top: 8px;
+    opacity: 0.7;
+    font-size: 0.85rem;
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.about-card {
+    background: rgba(255,255,255,0.04);
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+    border: 1px solid rgba(139,92,246,0.15);
+    transition: all 0.3s;
+}
+
+.about-card:hover {
+    transform: translateY(-5px);
+    border-color: #8b5cf6;
+}
+
+.about-card i {
+    font-size: 2rem;
+    background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 12px;
+}
+
+.about-card h3 {
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+}
+
+.about-card p {
+    opacity: 0.8;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.about-project {
+    background: rgba(255,255,255,0.03);
+    border-radius: 24px;
+    padding: 32px;
+    text-align: center;
+    border: 1px solid rgba(139,92,246,0.15);
+}
+
+.about-project h2 {
+    margin-bottom: 16px;
+    font-size: 1.5rem;
+}
+
+.about-project p {
+    line-height: 1.7;
+    opacity: 0.9;
+    margin-bottom: 16px;
+}
+
+.about-quote {
+    font-style: italic;
+    color: #8b5cf6;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .about-hero { padding: 32px; }
+    .about-name { font-size: 1.5rem; }
+    .about-stats { grid-template-columns: repeat(2, 1fr); }
+    .about-grid { grid-template-columns: 1fr; }
+}
+</style>
 {% endblock %}

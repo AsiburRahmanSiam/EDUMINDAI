@@ -14,7 +14,7 @@
         {% endfor %}
     </div>
     <div class="chat-input-container">
-        <button class="mic-btn" onclick="startVoiceInput()"><i class="fas fa-microphone"></i></button>
+        <button class="mic-btn" id="voiceBtn" onclick="startVoiceInput()"><i class="fas fa-microphone"></i></button>
         <input type="text" id="messageInput" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter') sendMessage()">
         <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
     </div>
@@ -22,6 +22,7 @@
 
 <script>
 let currentLang = localStorage.getItem('language') || 'en';
+let isListening = false;
 
 async function sendMessage() {
     const input = document.getElementById('messageInput');
@@ -30,12 +31,21 @@ async function sendMessage() {
     addMessage(message, 'user');
     input.value = '';
 
+    // Show typing indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message assistant';
+    typingDiv.id = 'typingIndicator';
+    typingDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+    document.getElementById('chatMessages').appendChild(typingDiv);
+
     const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: message, language: currentLang })
     });
     const data = await response.json();
+
+    document.getElementById('typingIndicator')?.remove();
     addMessage(data.reply, 'assistant');
 }
 
@@ -52,5 +62,90 @@ function addMessage(text, role) {
     div.appendChild(msgDiv);
     div.scrollTop = div.scrollHeight;
 }
+
+function startVoiceInput() {
+    let recognitionLang = 'en-US';
+    let displayLang = 'English';
+
+    if(currentLang === 'bn') {
+        recognitionLang = 'bn-BD';
+        displayLang = 'Bangla';
+    } else if(currentLang === 'zh') {
+        recognitionLang = 'zh-CN';
+        displayLang = 'Chinese';
+    } else {
+        recognitionLang = 'en-US';
+        displayLang = 'English';
+    }
+
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = recognitionLang;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    const voiceBtn = document.getElementById('voiceBtn');
+    voiceBtn.style.background = '#ef4444';
+    voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+
+    recognition.onresult = (event) => {
+        const speechText = event.results[0][0].transcript;
+        document.getElementById('messageInput').value = speechText;
+        sendMessage();
+        voiceBtn.style.background = '';
+        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        let errorMsg = 'Voice input error';
+        if(event.error === 'no-speech') errorMsg = 'No speech detected. Please try again.';
+        else if(event.error === 'not-allowed') errorMsg = 'Microphone access denied. Please allow microphone.';
+        showToast(errorMsg, 'danger');
+        voiceBtn.style.background = '';
+        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+    };
+
+    recognition.onend = () => {
+        voiceBtn.style.background = '';
+        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+    };
+
+    recognition.start();
+}
+
+function showToast(message, type) {
+    const container = document.getElementById('alertContainer');
+    if(container) {
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type}`;
+        toast.innerHTML = message;
+        container.prepend(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+}
 </script>
+
+<style>
+.typing-indicator {
+    display: flex;
+    gap: 5px;
+    padding: 12px 20px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 20px;
+    width: fit-content;
+}
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: #8b5cf6;
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-10px); opacity: 1; }
+}
+</style>
 {% endblock %}
