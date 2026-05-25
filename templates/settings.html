@@ -4,6 +4,27 @@
     <h1>⚙️ Settings</h1>
     <p style="opacity: 0.7; margin-bottom: 30px;">Customize your experience</p>
 
+    <!-- Profile Picture Upload Section -->
+    <div class="card" style="margin-bottom: 30px;">
+        <h3>Profile Picture</h3>
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #06b6d4); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                {% if session.user_profile_image %}
+                <img src="{{ url_for('static', filename='uploads/' + session.user_profile_image) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                <i class="fas fa-user" style="font-size: 40px; color: white;"></i>
+                {% endif %}
+            </div>
+            <div>
+                <form id="profileImageForm" action="{{ url_for('upload_profile_image') }}" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="profile_image" id="profileImageInput" accept="image/*" style="display: none;">
+                    <button type="button" onclick="document.getElementById('profileImageInput').click()" class="btn-primary">Upload Photo</button>
+                </form>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 8px;">Upload your profile picture</p>
+            </div>
+        </div>
+    </div>
+
     <div class="card" style="margin-bottom: 30px;">
         <h3>Preferences</h3>
         <form method="POST">
@@ -35,4 +56,21 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.getElementById('profileImageInput').addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('profile_image', file);
+            const response = await fetch('/api/upload_profile_image', { method: 'POST', body: formData });
+            const data = await response.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Failed to upload image');
+            }
+        }
+    });
+</script>
 {% endblock %}

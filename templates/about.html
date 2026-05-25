@@ -2,19 +2,9 @@
 {% block content %}
 <div class="about-section">
     <div class="profile-card">
-        <div class="profile-image" id="profileImageContainer">
-            {% if session.user_profile_image %}
-            <img src="{{ url_for('static', filename='uploads/' + session.user_profile_image) }}" style="width: 100%; height: 100%; object-fit: cover;">
-            {% else %}
-            <i class="fas fa-user-astronaut"></i>
-            {% endif %}
+        <div class="profile-image">
+            <img src="{{ url_for('static', filename='images/asibur-profile.jpg') }}" alt="Asibur Rahman Siam" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
-        <form id="imageUploadForm" action="{{ url_for('upload_profile_image') }}" method="POST" enctype="multipart/form-data" style="display: none;">
-            <input type="file" name="profile_image" id="profileImageInput" accept="image/*">
-        </form>
-        <button onclick="document.getElementById('profileImageInput').click()" class="btn-primary" style="margin-bottom: 16px; font-size: 0.8rem; padding: 6px 16px;">
-            <i class="fas fa-camera"></i> Change Photo
-        </button>
 
         <h1 class="profile-name">Asibur Rahman Siam</h1>
         <p class="profile-title">⭐ Software Engineering Student | AI Enthusiast | Creator of EduMind Nexus</p>
@@ -75,18 +65,4 @@
         </p>
     </div>
 </div>
-
-<script>
-    document.getElementById('profileImageInput').addEventListener('change', async function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const formData = new FormData();
-            formData.append('profile_image', file);
-            const response = await fetch('/api/upload_profile_image', { method: 'POST', body: formData });
-            const data = await response.json();
-            if (data.success) location.reload();
-            else alert('Failed to upload image');
-        }
-    });
-</script>
 {% endblock %}
