@@ -21,6 +21,7 @@
 </div>
 
 <script>
+// Get current language from localStorage (set by base.html)
 let currentLang = localStorage.getItem('language') || 'en';
 let isListening = false;
 
@@ -63,54 +64,83 @@ function addMessage(text, role) {
     div.scrollTop = div.scrollHeight;
 }
 
-function startVoiceInput() {
-    let recognitionLang = 'en-US';
-    let displayLang = 'English';
+// Auto-detect language from speech
+function detectLanguageFromSpeech(text) {
+    // Check for Bengali characters (Unicode range: 0980-09FF)
+    const bengaliRegex = /[\u0980-\u09FF]/;
+    // Check for Chinese characters (Unicode range: 4E00-9FFF)
+    const chineseRegex = /[\u4E00-\u9FFF]/;
 
-    if(currentLang === 'bn') {
-        recognitionLang = 'bn-BD';
-        displayLang = 'Bangla';
-    } else if(currentLang === 'zh') {
-        recognitionLang = 'zh-CN';
-        displayLang = 'Chinese';
+    if (bengaliRegex.test(text)) {
+        return 'bn';
+    } else if (chineseRegex.test(text)) {
+        return 'zh';
     } else {
-        recognitionLang = 'en-US';
-        displayLang = 'English';
+        return 'en';
     }
+}
 
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = recognitionLang;
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+function startVoiceInput() {
+    // Use browser's default language detection
+    // We'll try multiple languages and let the browser decide
+    let recognitionLanguages = ['en-US', 'bn-BD', 'zh-CN'];
+    let currentIndex = 0;
 
     const voiceBtn = document.getElementById('voiceBtn');
     voiceBtn.style.background = '#ef4444';
     voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
 
-    recognition.onresult = (event) => {
-        const speechText = event.results[0][0].transcript;
-        document.getElementById('messageInput').value = speechText;
-        sendMessage();
-        voiceBtn.style.background = '';
-        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-    };
+    function tryRecognition() {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = recognitionLanguages[currentIndex];
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
 
-    recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        let errorMsg = 'Voice input error';
-        if(event.error === 'no-speech') errorMsg = 'No speech detected. Please try again.';
-        else if(event.error === 'not-allowed') errorMsg = 'Microphone access denied. Please allow microphone.';
-        showToast(errorMsg, 'danger');
-        voiceBtn.style.background = '';
-        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-    };
+        recognition.onresult = (event) => {
+            const speechText = event.results[0][0].transcript;
+            // Auto-detect language from the spoken text
+            const detectedLang = detectLanguageFromSpeech(speechText);
 
-    recognition.onend = () => {
-        voiceBtn.style.background = '';
-        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-    };
+            // Update the global language if needed
+            if (detectedLang !== currentLang) {
+                currentLang = detectedLang;
+                localStorage.setItem('language', currentLang);
+                // Update the language selector in base.html
+                if(document.getElementById('languageSelect')) {
+                    document.getElementById('languageSelect').value = currentLang;
+                }
+                showToast(`Language changed to ${currentLang.toUpperCase()}`, 'info');
+            }
 
-    recognition.start();
+            document.getElementById('messageInput').value = speechText;
+            sendMessage();
+            voiceBtn.style.background = '';
+            voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+        };
+
+        recognition.onerror = (event) => {
+            if (event.error === 'language-not-supported' && currentIndex < recognitionLanguages.length - 1) {
+                currentIndex++;
+                tryRecognition();
+            } else {
+                console.error('Speech recognition error:', event.error);
+                let errorMsg = 'Voice input error';
+                if(event.error === 'no-speech') errorMsg = 'No speech detected. Please try again.';
+                else if(event.error === 'not-allowed') errorMsg = 'Microphone access denied. Please allow microphone.';
+                showToast(errorMsg, 'danger');
+                voiceBtn.style.background = '';
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+            }
+        };
+
+        recognition.onend = () => {
+            // Don't reset here, already reset in result/error
+        };
+
+        recognition.start();
+    }
+
+    tryRecognition();
 }
 
 function showToast(message, type) {
@@ -122,6 +152,22 @@ function showToast(message, type) {
         container.prepend(toast);
         setTimeout(() => toast.remove(), 3000);
     }
+}
+
+// Listen for language changes from base.html
+window.addEventListener('storage', function(e) {
+    if (e.key === 'language') {
+        currentLang = e.newValue;
+        showToast(`Language changed to ${currentLang.toUpperCase()}`, 'info');
+    }
+});
+
+// Also listen for language selector changes
+if(document.getElementById('languageSelect')) {
+    const observer = new MutationObserver(function() {
+        currentLang = localStorage.getItem('language') || 'en';
+    });
+    observer.observe(document.getElementById('languageSelect'), { attributes: true });
 }
 </script>
 
