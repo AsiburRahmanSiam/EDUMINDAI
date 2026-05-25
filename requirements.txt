@@ -1,7 +1,12 @@
-﻿Flask==3.0.3
+Flask==3.0.3
 Flask-SQLAlchemy==3.1.1
+Werkzeug==3.0.3
+python-dotenv==1.0.1
+requests==2.32.3
 PyPDF2==3.0.1
 python-docx==1.1.2
 gTTS==2.5.3
-requests==2.32.3
-python-dotenv==1.0.1
+SpeechRecognition==3.10.4
+pandas==2.2.2
+matplotlib==3.9.0
+gunicorn==22.0.0
