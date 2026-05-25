@@ -23,14 +23,19 @@
 <script>
 // Get current language from localStorage (set by base.html)
 let currentLang = localStorage.getItem('language') || 'en';
-let isListening = false;
+let isProcessing = false;
 
+// Send message function
 async function sendMessage() {
+    if(isProcessing) return;
+
     const input = document.getElementById('messageInput');
     const message = input.value.trim();
     if(!message) return;
+
     addMessage(message, 'user');
     input.value = '';
+    isProcessing = true;
 
     // Show typing indicator
     const typingDiv = document.createElement('div');
@@ -38,111 +43,107 @@ async function sendMessage() {
     typingDiv.id = 'typingIndicator';
     typingDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
     document.getElementById('chatMessages').appendChild(typingDiv);
+    scrollToBottom();
 
-    const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: message, language: currentLang })
-    });
-    const data = await response.json();
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message, language: currentLang })
+        });
+        const data = await response.json();
 
-    document.getElementById('typingIndicator')?.remove();
-    addMessage(data.reply, 'assistant');
+        // Remove typing indicator
+        document.getElementById('typingIndicator')?.remove();
+        addMessage(data.reply, 'assistant');
+    } catch(error) {
+        document.getElementById('typingIndicator')?.remove();
+        addMessage('⚠️ Network error. Please try again.', 'assistant');
+    }
+
+    isProcessing = false;
 }
 
+// Add message to chat
 function addMessage(text, role) {
     const div = document.getElementById('chatMessages');
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${role}`;
     msgDiv.innerHTML = `
         <div class="message-content">
-            ${text.replace(/\n/g, '<br>')}
-            ${role === 'assistant' ? '<button onclick="speakText(this.parentElement.innerText)" style="background:none; border:none; color:#8b5cf6; margin-top:10px; cursor:pointer;">🔊 Play</button>' : ''}
+            ${text.replace(/\n/g, '<br>').replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')}
+            ${role === 'assistant' ? '<button onclick="speakText(this.parentElement.innerText.split(\'🔊 Play\')[0])" style="background:none; border:none; color:#8b5cf6; margin-top:10px; cursor:pointer;">🔊 Play Audio</button>' : ''}
         </div>
     `;
     div.appendChild(msgDiv);
-    div.scrollTop = div.scrollHeight;
+    scrollToBottom();
 }
 
-// Auto-detect language from speech
-function detectLanguageFromSpeech(text) {
-    // Check for Bengali characters (Unicode range: 0980-09FF)
-    const bengaliRegex = /[\u0980-\u09FF]/;
-    // Check for Chinese characters (Unicode range: 4E00-9FFF)
-    const chineseRegex = /[\u4E00-\u9FFF]/;
-
-    if (bengaliRegex.test(text)) {
-        return 'bn';
-    } else if (chineseRegex.test(text)) {
-        return 'zh';
-    } else {
-        return 'en';
-    }
+function scrollToBottom() {
+    const messagesDiv = document.getElementById('chatMessages');
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
+// Voice Input with Auto Language Detection
 function startVoiceInput() {
-    // Use browser's default language detection
-    // We'll try multiple languages and let the browser decide
-    let recognitionLanguages = ['en-US', 'bn-BD', 'zh-CN'];
-    let currentIndex = 0;
+    // Get the currently selected language from the global selector
+    currentLang = localStorage.getItem('language') || 'en';
+
+    let recognitionLang = 'en-US';
+    let displayLang = 'English';
+
+    if(currentLang === 'bn') {
+        recognitionLang = 'bn-BD';
+        displayLang = 'Bangla';
+    } else if(currentLang === 'zh') {
+        recognitionLang = 'zh-CN';
+        displayLang = 'Chinese';
+    } else {
+        recognitionLang = 'en-US';
+        displayLang = 'English';
+    }
 
     const voiceBtn = document.getElementById('voiceBtn');
     voiceBtn.style.background = '#ef4444';
     voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
 
-    function tryRecognition() {
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = recognitionLanguages[currentIndex];
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = recognitionLang;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-        recognition.onresult = (event) => {
-            const speechText = event.results[0][0].transcript;
-            // Auto-detect language from the spoken text
-            const detectedLang = detectLanguageFromSpeech(speechText);
+    recognition.onresult = (event) => {
+        const speechText = event.results[0][0].transcript;
+        document.getElementById('messageInput').value = speechText;
+        sendMessage();
+        voiceBtn.style.background = '';
+        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+    };
 
-            // Update the global language if needed
-            if (detectedLang !== currentLang) {
-                currentLang = detectedLang;
-                localStorage.setItem('language', currentLang);
-                // Update the language selector in base.html
-                if(document.getElementById('languageSelect')) {
-                    document.getElementById('languageSelect').value = currentLang;
-                }
-                showToast(`Language changed to ${currentLang.toUpperCase()}`, 'info');
-            }
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        let errorMsg = 'Voice input error';
+        if(event.error === 'no-speech') errorMsg = 'No speech detected. Please try again.';
+        else if(event.error === 'not-allowed') errorMsg = 'Microphone access denied. Please allow microphone.';
+        else if(event.error === 'language-not-supported') errorMsg = `${displayLang} language not supported. Try English.`;
 
-            document.getElementById('messageInput').value = speechText;
-            sendMessage();
+        showToast(errorMsg, 'danger');
+        voiceBtn.style.background = '';
+        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+    };
+
+    recognition.onend = () => {
+        // Reset button if still red
+        if(voiceBtn.style.background === '#ef4444') {
             voiceBtn.style.background = '';
             voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-        };
+        }
+    };
 
-        recognition.onerror = (event) => {
-            if (event.error === 'language-not-supported' && currentIndex < recognitionLanguages.length - 1) {
-                currentIndex++;
-                tryRecognition();
-            } else {
-                console.error('Speech recognition error:', event.error);
-                let errorMsg = 'Voice input error';
-                if(event.error === 'no-speech') errorMsg = 'No speech detected. Please try again.';
-                else if(event.error === 'not-allowed') errorMsg = 'Microphone access denied. Please allow microphone.';
-                showToast(errorMsg, 'danger');
-                voiceBtn.style.background = '';
-                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-            }
-        };
-
-        recognition.onend = () => {
-            // Don't reset here, already reset in result/error
-        };
-
-        recognition.start();
-    }
-
-    tryRecognition();
+    recognition.start();
 }
 
+// Show toast notification
 function showToast(message, type) {
     const container = document.getElementById('alertContainer');
     if(container) {
@@ -162,13 +163,14 @@ window.addEventListener('storage', function(e) {
     }
 });
 
-// Also listen for language selector changes
-if(document.getElementById('languageSelect')) {
-    const observer = new MutationObserver(function() {
-        currentLang = localStorage.getItem('language') || 'en';
-    });
-    observer.observe(document.getElementById('languageSelect'), { attributes: true });
-}
+// Also check for language changes periodically
+setInterval(() => {
+    const newLang = localStorage.getItem('language') || 'en';
+    if(newLang !== currentLang) {
+        currentLang = newLang;
+        console.log('Language changed to:', currentLang);
+    }
+}, 1000);
 </script>
 
 <style>
@@ -192,6 +194,19 @@ if(document.getElementById('languageSelect')) {
 @keyframes typing {
     0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
     30% { transform: translateY(-10px); opacity: 1; }
+}
+.chat-messages {
+    scroll-behavior: smooth;
+}
+.message-content pre {
+    background: rgba(0,0,0,0.2);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 10px 0;
+}
+.message-content code {
+    font-family: monospace;
 }
 </style>
 {% endblock %}
