@@ -53,7 +53,6 @@ async function sendMessage() {
         });
         const data = await response.json();
 
-        // Remove typing indicator
         document.getElementById('typingIndicator')?.remove();
         addMessage(data.reply, 'assistant');
     } catch(error) {
@@ -84,9 +83,9 @@ function scrollToBottom() {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-// Voice Input with Auto Language Detection
+// Voice Input - Uses the currently selected language from the global selector
 function startVoiceInput() {
-    // Get the currently selected language from the global selector
+    // Always get the latest language from localStorage
     currentLang = localStorage.getItem('language') || 'en';
 
     let recognitionLang = 'en-US';
@@ -132,18 +131,9 @@ function startVoiceInput() {
         voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
     };
 
-    recognition.onend = () => {
-        // Reset button if still red
-        if(voiceBtn.style.background === '#ef4444') {
-            voiceBtn.style.background = '';
-            voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-        }
-    };
-
     recognition.start();
 }
 
-// Show toast notification
 function showToast(message, type) {
     const container = document.getElementById('alertContainer');
     if(container) {
@@ -155,7 +145,7 @@ function showToast(message, type) {
     }
 }
 
-// Listen for language changes from base.html
+// Sync with language changes from base.html
 window.addEventListener('storage', function(e) {
     if (e.key === 'language') {
         currentLang = e.newValue;
@@ -168,9 +158,9 @@ setInterval(() => {
     const newLang = localStorage.getItem('language') || 'en';
     if(newLang !== currentLang) {
         currentLang = newLang;
-        console.log('Language changed to:', currentLang);
+        console.log('Chat language synced to:', currentLang);
     }
-}, 1000);
+}, 500);
 </script>
 
 <style>
