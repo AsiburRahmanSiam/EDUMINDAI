@@ -1,0 +1,5 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div><a href="{{ url_for('notes') }}" style="color:#8b5cf6">← Back</a>
+<div class="card" style="margin-top:20px"><h2>{{ note.original_name }}</h2><small>{{ note.created_at.strftime('%Y-%m-%d') }}</small><hr style="margin:20px 0; border-color:rgba(255,255,255,0.1)"><div style="line-height:1.8">{{ note.summary | safe }}</div></div></div>
+{% endblock %}

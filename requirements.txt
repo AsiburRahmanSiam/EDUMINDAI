@@ -1,0 +1,7 @@
+﻿Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+PyPDF2==3.0.1
+python-docx==1.1.2
+gTTS==2.5.3
+requests==2.32.3
+python-dotenv==1.0.1

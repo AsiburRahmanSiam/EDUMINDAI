@@ -1,0 +1,7 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div><h1>🎴 Flashcards</h1>
+<div class="card" style="margin-bottom:30px"><h3>Generate</h3><form method="POST"><div class="form-group"><input type="text" name="topic" placeholder="Enter topic..." required></div><button type="submit" class="btn-primary">Generate</button></form></div>
+{% if cards %}<h3>New Flashcards</h3><div class="flashcard-grid">{% for card in cards %}<div class="flashcard" onclick="this.classList.toggle('flipped')"><div><strong>{{ card.front }}</strong><hr><span>{{ card.back }}</span></div></div>{% endfor %}</div>{% endif %}
+{% if saved_cards %}<h3>Saved Flashcards</h3><div class="flashcard-grid">{% for card in saved_cards %}<div class="flashcard" onclick="this.classList.toggle('flipped')"><div><strong>{{ card.front }}</strong><hr><span>{{ card.back }}</span></div></div>{% endfor %}</div>{% endif %}</div>
+{% endblock %}

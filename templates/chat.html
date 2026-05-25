@@ -1,0 +1,18 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="chat-container">
+    <div class="chat-messages" id="chatMessages">
+        {% for msg in history %}
+        <div class="message {{ msg.role }}"><div class="message-content">{{ msg.content | safe }}{% if msg.role == "assistant" %}<button onclick="speakText('{{ msg.content | replace("'", "\\'") }}')" style="background:none; border:none; color:#8b5cf6; margin-top:10px; cursor:pointer">🔊 Play</button>{% endif %}</div></div>
+        {% endfor %}
+    </div>
+    <div class="chat-input-container"><button onclick="startVoiceInput()" style="background:rgba(255,255,255,0.1)"><i class="fas fa-microphone"></i></button><input type="text" id="messageInput" placeholder="Ask anything..." onkeypress="handleKeyPress(event)"><button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button></div>
+</div>
+<script>
+let currentLang=localStorage.getItem('language')||'en';
+async function sendMessage(){const input=document.getElementById('messageInput');const msg=input.value.trim();if(!msg)return;addMessage(msg,'user');input.value='';const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,language:currentLang})});const data=await res.json();addMessage(data.reply,'assistant');}
+function addMessage(text,role){const div=document.getElementById('chatMessages');const msgDiv=document.createElement('div');msgDiv.className=`message ${role}`;msgDiv.innerHTML=`<div class="message-content">${text.replace(/\n/g,'<br>')}${role==='assistant'?'<button onclick="speakText(this.parentElement.innerText)" style="background:none;border:none;color:#8b5cf6;margin-top:10px;cursor:pointer">🔊 Play</button>':''}</div>`;div.appendChild(msgDiv);div.scrollTop=div.scrollHeight;}
+function startVoiceInput(){const recognition=new(window.SpeechRecognition||window.webkitSpeechRecognition)();recognition.lang=currentLang==='bn'?'bn-BD':currentLang==='zh'?'zh-CN':'en-US';recognition.onresult=(event)=>{document.getElementById('messageInput').value=event.results[0][0].transcript;sendMessage();};recognition.start();}
+function handleKeyPress(e){if(e.key==='Enter')sendMessage();}
+</script>
+{% endblock %}

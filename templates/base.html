@@ -1,0 +1,240 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduMind Nexus AI - Premium Study Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --primary-light: #8b5cf6;
+            --secondary: #06b6d4;
+            --accent: #ec4899;
+            --dark: #0f172a;
+            --light: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #020617 100%); color: var(--light); overflow-x: hidden; }
+
+        /* Animated Background */
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+        .bg-animation::before { content: ''; position: absolute; width: 200%; height: 200%; background: radial-gradient(circle at 20% 30%, rgba(124,58,237,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(6,182,212,0.15) 0%, transparent 50%); animation: bgMove 20s ease-in-out infinite; }
+        @keyframes bgMove { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-5%,-5%)} }
+
+        /* Sidebar */
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: rgba(15,23,42,0.95); backdrop-filter: blur(10px); border-right: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; z-index: 100; }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .logo { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, var(--primary-light), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .sidebar-nav { padding: 20px 0; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: var(--light); text-decoration: none; transition: all 0.2s; margin: 4px 12px; border-radius: 12px; opacity: 0.7; }
+        .nav-item:hover, .nav-item.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); opacity: 1; transform: translateX(5px); }
+        .sidebar-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 24px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* Main Content */
+        .main-content { margin-left: 280px; min-height: 100vh; padding: 20px 30px; }
+
+        /* Top Bar */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding: 16px 24px; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+
+        /* ============================================ */
+        /* LANGUAGE SELECTOR - FIXED (Beautiful Design) */
+        /* ============================================ */
+        .language-selector {
+            position: relative;
+            display: inline-block;
+        }
+
+        .language-selector select {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            color: #f8fafc;
+            padding: 8px 32px 8px 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .language-selector select:hover {
+            background: linear-gradient(135deg, #2d3a5e, #1e293b);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+        }
+
+        .language-selector select option {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 12px;
+            font-size: 0.9rem;
+        }
+
+        .language-selector::before {
+            content: '🌐';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .language-selector::after {
+            content: '▼';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8b5cf6;
+            font-size: 10px;
+            pointer-events: none;
+        }
+
+        /* Cards */
+        .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 24px; transition: all 0.3s; }
+        .card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+
+        /* Chat */
+        .chat-container { max-width: 900px; margin: 0 auto; }
+        .chat-messages { height: 500px; overflow-y: auto; padding: 20px; }
+        .message { margin-bottom: 20px; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .message.user { text-align: right; }
+        .message-content { display: inline-block; max-width: 80%; padding: 12px 20px; border-radius: 20px; line-height: 1.5; }
+        .message.user .message-content { background: linear-gradient(135deg, var(--primary), var(--secondary)); border-bottom-right-radius: 5px; }
+        .message.assistant .message-content { background: rgba(255,255,255,0.1); border-bottom-left-radius: 5px; }
+        .chat-input-container { display: flex; gap: 12px; margin-top: 20px; padding: 12px 20px; background: rgba(255,255,255,0.05); border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); }
+        .chat-input-container input { flex: 1; background: transparent; border: none; color: var(--light); font-size: 1rem; outline: none; }
+        .chat-input-container button { background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: transform 0.2s; }
+        .chat-input-container button:hover { transform: scale(1.05); }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-bottom: 30px; }
+        .stat-card { text-align: center; }
+        .stat-card i { font-size: 2.5rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .stat-card h3 { font-size: 2rem; margin-top: 12px; }
+
+        /* Buttons */
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; padding: 12px 28px; border-radius: 30px; color: white; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(124,58,237,0.3); }
+
+        /* Forms */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 14px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: var(--light); font-size: 1rem; }
+
+        /* Alerts */
+        .alert { padding: 14px 20px; border-radius: 12px; margin-bottom: 20px; }
+        .alert-success { background: rgba(16,185,129,0.2); border-left: 4px solid #10b981; }
+        .alert-danger { background: rgba(239,68,68,0.2); border-left: 4px solid #ef4444; }
+        .alert-warning { background: rgba(245,158,11,0.2); border-left: 4px solid #f59e0b; }
+
+        /* Flashcards */
+        .flashcard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 30px; }
+        .flashcard { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.3s; min-height: 200px; display: flex; align-items: center; justify-content: center; }
+        .flashcard:hover { transform: scale(1.02); background: rgba(124,58,237,0.2); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } .main-content { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    {% if session.user_id %}
+    <div class="sidebar">
+        <div class="sidebar-header"><h2 class="logo"><i class="fas fa-brain"></i> EduMind Nexus</h2></div>
+        <div class="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{{ url_for('chat') }}" class="nav-item"><i class="fas fa-comments"></i> AI Chat</a>
+            <a href="{{ url_for('notes') }}" class="nav-item"><i class="fas fa-file-alt"></i> Notes</a>
+            <a href="{{ url_for('quiz') }}" class="nav-item"><i class="fas fa-question-circle"></i> Quiz</a>
+            <a href="{{ url_for('planner') }}" class="nav-item"><i class="fas fa-calendar-alt"></i> Planner</a>
+            <a href="{{ url_for('flashcards') }}" class="nav-item"><i class="fas fa-layer-group"></i> Flashcards</a>
+            <a href="{{ url_for('settings') }}" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+        </div>
+        <div class="sidebar-footer"><a href="{{ url_for('logout') }}" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a></div>
+    </div>
+    {% endif %}
+
+    <div class="main-content">
+        <div class="top-bar">
+            {% if session.user_id %}<span><i class="fas fa-user-circle"></i> Welcome, {{ session.username }}!</span>{% endif %}
+            {% if session.user_id %}
+            <div class="language-selector">
+                <select id="languageSelect">
+                    <option value="en">🇺🇸 English</option>
+                    <option value="bn">🇧🇩 বাংলা</option>
+                    <option value="zh">🇨🇳 中文</option>
+                </select>
+            </div>
+            {% endif %}
+        </div>
+
+        <div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        let currentLang = localStorage.getItem('language') || 'en';
+        if(document.getElementById('languageSelect')) {
+            document.getElementById('languageSelect').value = currentLang;
+            document.getElementById('languageSelect').addEventListener('change', (e) => {
+                localStorage.setItem('language', e.target.value);
+                location.reload();
+            });
+        }
+
+        async function speakText(text) {
+            const response = await fetch('/api/tts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text, lang: currentLang })
+            });
+            const data = await response.json();
+            if(data.audio_url) {
+                const audio = new Audio(data.audio_url);
+                audio.play();
+            }
+        }
+
+        function showToast(msg, type) {
+            const container = document.querySelector('.alert-container') || document.querySelector('.main-content > div');
+            if(container) {
+                const toast = document.createElement('div');
+                toast.className = `alert alert-${type}`;
+                toast.innerHTML = msg;
+                container.prepend(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+        }
+    </script>
+</body>
+</html>
