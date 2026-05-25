@@ -72,43 +72,60 @@
             50% { opacity: 0.5; }
         }
 
-        /* Sidebar - Collapsible for Mobile */
+        /* Sidebar - Dark Mode Fix */
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
             width: 280px;
             height: 100vh;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            border-right: 1px solid var(--border);
             z-index: 100;
             transition: transform 0.3s ease;
         }
-        .sidebar.collapsed {
-            transform: translateX(-100%);
+
+        body.dark .sidebar {
+            background: rgba(10, 15, 25, 0.98) !important;
+            backdrop-filter: blur(15px) !important;
+            border-right: 1px solid rgba(139, 92, 246, 0.2) !important;
         }
+
+        body.light .sidebar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px) !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
         .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border); }
         .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, var(--primary-light), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .sidebar-nav { padding: 20px 0; }
+
         .nav-item {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 12px 24px;
-            color: var(--text);
             text-decoration: none;
             transition: all 0.2s ease;
             margin: 4px 12px;
             border-radius: 12px;
             opacity: 0.7;
         }
+
+        body.dark .nav-item {
+            color: #e2e8f0 !important;
+        }
+
+        body.light .nav-item {
+            color: #1e293b !important;
+        }
+
         .nav-item:hover, .nav-item.active {
-            background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.2));
+            background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(6,182,212,0.15));
             opacity: 1;
             transform: translateX(5px);
             border-left: 2px solid var(--primary);
         }
+
         .sidebar-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 24px; border-top: 1px solid var(--border); }
 
         /* Main Content */
@@ -145,6 +162,13 @@
             border-radius: 20px;
             border: 1px solid var(--border);
         }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         .user-menu {
             position: relative;
             cursor: pointer;
@@ -174,15 +198,93 @@
         }
         .user-menu-dropdown a:hover { background: rgba(124,58,237,0.2); }
 
-        /* Language Selector */
+        /* Language Selector - Dark/Light Mode Fix */
+        .language-selector {
+            position: relative;
+            display: inline-block;
+            margin-left: 15px;
+        }
+
         .language-selector select {
             background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 1px solid rgba(139, 92, 246, 0.5);
+            border: 1px solid rgba(139, 92, 246, 0.4);
             color: #f8fafc;
             padding: 8px 32px 8px 40px;
             border-radius: 30px;
             cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
             appearance: none;
+            -webkit-appearance: none;
+        }
+
+        body.light .language-selector select {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+            border: 1px solid #7c3aed;
+            color: #1e293b;
+        }
+
+        .language-selector select:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .language-selector select option {
+            background: #1e293b;
+            color: #f8fafc;
+        }
+
+        body.light .language-selector select option {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .language-selector::before {
+            content: '🌐';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .language-selector::after {
+            content: '▼';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8b5cf6;
+            font-size: 10px;
+            pointer-events: none;
+        }
+
+        body.light .language-selector::after {
+            color: #7c3aed;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-left: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .theme-toggle:hover {
+            background: rgba(124,58,237,0.2);
         }
 
         /* Cards */
@@ -206,6 +308,8 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
         }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(124,58,237,0.3); }
 
@@ -222,6 +326,7 @@
         }
 
         /* Chat */
+        .chat-container { max-width: 900px; margin: 0 auto; }
         .chat-messages { height: 500px; overflow-y: auto; padding: 20px; }
         .message { margin-bottom: 20px; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -260,7 +365,7 @@
             border: 1px solid var(--border);
         }
         .chat-input-container input { flex: 1; background: transparent; border: none; color: var(--text); outline: none; }
-        .chat-input-container button { background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
+        .chat-input-container button { background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; color: white; }
         .mic-btn { background: rgba(255,255,255,0.1) !important; }
 
         /* Stats Grid */
@@ -305,6 +410,128 @@
             color: var(--text);
         }
 
+        /* Auth Pages */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 85vh;
+        }
+        .auth-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 48px;
+            width: 460px;
+        }
+        .auth-header { text-align: center; margin-bottom: 32px; }
+        .auth-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .auth-icon i { font-size: 32px; color: white; }
+        .auth-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--text), #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px 18px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+        .input-group:hover { border-color: #7c3aed; background: rgba(124, 58, 237, 0.1); }
+        .input-group i { color: #7c3aed; font-size: 18px; width: 24px; }
+        .input-group input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+        }
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4); gap: 12px; }
+        .auth-footer { text-align: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .auth-footer a { color: #8b5cf6; text-decoration: none; }
+
+        /* About Page */
+        .about-section { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .profile-card {
+            background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.08));
+            border-radius: 32px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            overflow: hidden;
+        }
+        .profile-image i { font-size: 70px; color: white; }
+        .profile-name { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+        .profile-title { color: #8b5cf6; margin-bottom: 16px; }
+        .profile-bio { max-width: 600px; margin: 0 auto; line-height: 1.6; opacity: 0.9; }
+        .social-links { display: flex; justify-content: center; gap: 20px; margin-top: 24px; }
+        .social-links a {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 1.3rem;
+        }
+        .social-links a:hover { background: #7c3aed; transform: translateY(-3px); }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 30px; }
+        .info-card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 24px; text-align: center; }
+        .info-card i { font-size: 2rem; color: #8b5cf6; margin-bottom: 12px; }
+        body.light .info-card { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.08); }
+
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
@@ -312,6 +539,11 @@
             .main-content { margin-left: 0; }
             .mobile-menu-btn { display: block; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .auth-card { width: 90%; padding: 32px; }
+            .top-bar { flex-wrap: wrap; gap: 10px; }
+            .user-info { order: 1; }
+            .language-selector { order: 2; }
+            .user-menu { order: 3; }
         }
     </style>
 </head>
@@ -343,26 +575,29 @@
                 <span><i class="fas fa-fire"></i> Streak: {{ session.get('study_streak', 0) }} days</span>
                 {% endif %}
             </div>
-            <div class="user-menu">
-                <i class="fas fa-user-circle" style="font-size: 1.5rem;"></i>
-                <div class="user-menu-dropdown">
-                    <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                    <a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Settings</a>
-                    <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <div style="display: flex; align-items: center;">
+                {% if session.user_id %}
+                <div class="language-selector">
+                    <select id="languageSelect">
+                        <option value="en">English</option>
+                        <option value="bn">বাংলা</option>
+                        <option value="zh">中文</option>
+                    </select>
                 </div>
+                <button onclick="toggleTheme()" class="theme-toggle">
+                    <i class="fas {{ 'fa-sun' if session.get('dark_mode', True) else 'fa-moon' }}"></i>
+                </button>
+                <div class="user-menu">
+                    <i class="fas fa-user-circle" style="font-size: 1.5rem; cursor: pointer;"></i>
+                    <div class="user-menu-dropdown">
+                        <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="{{ url_for('about') }}"><i class="fas fa-user"></i> Profile</a>
+                        <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+                {% endif %}
             </div>
-            {% if session.user_id %}
-            <div class="language-selector">
-                <select id="languageSelect">
-                    <option value="en">🌐 English</option>
-                    <option value="bn">🇧🇩 বাংলা</option>
-                    <option value="zh">🇨🇳 中文</option>
-                </select>
-            </div>
-            <a href="{{ url_for('toggle_theme') }}" style="color: white; margin-left: 15px;">
-                <i class="fas {{ 'fa-sun' if session.get('dark_mode', True) else 'fa-moon' }}"></i>
-            </a>
-            {% endif %}
         </div>
 
         <div id="alertContainer">
@@ -407,6 +642,11 @@
             document.getElementById('sidebar').classList.toggle('show');
         }
 
+        function toggleTheme() {
+            fetch('/toggle_theme')
+                .then(() => location.reload());
+        }
+
         function showToast(message, type = 'success') {
             const container = document.getElementById('alertContainer');
             if(container) {
@@ -429,30 +669,6 @@
                 const audio = new Audio(data.audio_url);
                 audio.play();
             }
-        }
-
-        // Typing animation for chat
-        async function sendMessageWithTyping() {
-            const input = document.getElementById('messageInput');
-            if(!input.value.trim()) return;
-            addMessage(input.value, 'user');
-            input.value = '';
-
-            // Show typing indicator
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message assistant';
-            typingDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-            document.getElementById('chatMessages').appendChild(typingDiv);
-
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: input.value, language: currentLang })
-            });
-            const data = await response.json();
-
-            typingDiv.remove();
-            addMessage(data.reply, 'assistant');
         }
     </script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
