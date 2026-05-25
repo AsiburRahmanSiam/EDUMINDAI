@@ -108,17 +108,18 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-        /* Language Selector */
+        /* Language Selector - Premium Beautiful Design */
         .language-selector {
             position: relative;
             display: inline-block;
+            min-width: 150px;
         }
         .language-selector select {
-            background: linear-gradient(135deg, #1e293b, #2d3a5e);
-            border: 1px solid rgba(139, 92, 246, 0.5);
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid rgba(139, 92, 246, 0.6);
             color: #f8fafc;
-            padding: 10px 40px 10px 45px;
-            border-radius: 40px;
+            padding: 10px 35px 10px 45px;
+            border-radius: 50px;
             cursor: pointer;
             font-size: 0.9rem;
             font-weight: 600;
@@ -126,17 +127,62 @@
             transition: all 0.3s ease;
             appearance: none;
             -webkit-appearance: none;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
+            width: 100%;
         }
         body.light .language-selector select {
-            background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+            background: linear-gradient(135deg, #ffffff, #f1f5f9);
             color: #1e293b;
             border: 1px solid #8b5cf6;
         }
         .language-selector select:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+            border-color: #a78bfa;
+        }
+        .language-selector select:focus {
+            outline: none;
             border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+        .language-selector option {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 12px;
+        }
+        body.light .language-selector option {
+            background: #ffffff;
+            color: #1e293b;
+        }
+        /* Globe Icon */
+        .language-selector::before {
+            content: '🌐';
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            pointer-events: none;
+            z-index: 2;
+        }
+        /* Custom Arrow */
+        .language-selector::after {
+            content: '⌵';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #8b5cf6;
+            pointer-events: none;
+            transition: transform 0.2s;
+        }
+        .language-selector select:hover + .language-selector::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        body.light .language-selector::after {
+            color: #6d28d9;
         }
         /* Theme Toggle */
         .theme-toggle {
@@ -304,6 +350,8 @@
             .main-content { margin-left: 0; }
             .mobile-menu-btn { display: block; position: fixed; top: 20px; left: 20px; z-index: 101; background: linear-gradient(135deg, #7c3aed, #06b6d4); border: none; width: 45px; height: 45px; border-radius: 50%; color: white; font-size: 1.2rem; cursor: pointer; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .language-selector { min-width: 120px; }
+            .language-selector select { padding: 8px 30px 8px 38px; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -367,32 +415,17 @@
             'en': {
                 'dashboard': 'Dashboard', 'aiChat': 'AI Chat', 'notes': 'Notes', 'quiz': 'Quiz',
                 'planner': 'Planner', 'flashcards': 'Flashcards', 'about': 'About', 'settings': 'Settings',
-                'logout': 'Logout', 'streak': 'Streak', 'days': 'days',
-                'quickActions': 'Quick Actions', 'chatWithAI': 'Chat with AI',
-                'uploadNotes': 'Upload Notes', 'generateQuiz': 'Generate Quiz',
-                'createPlan': 'Create Plan', 'totalChats': 'AI Conversations',
-                'notesUploaded': 'Notes Uploaded', 'quizzesTaken': 'Quizzes Taken',
-                'flashcardsCreated': 'Flashcards', 'yourAiHub': 'Your AI-powered study hub'
+                'logout': 'Logout', 'streak': 'Streak', 'days': 'days'
             },
             'bn': {
                 'dashboard': 'ড্যাশবোর্ড', 'aiChat': 'এআই চ্যাট', 'notes': 'নোট', 'quiz': 'কুইজ',
                 'planner': 'প্ল্যানার', 'flashcards': 'ফ্ল্যাশকার্ড', 'about': 'সম্পর্কে', 'settings': 'সেটিংস',
-                'logout': 'লগআউট', 'streak': 'স্ট্রিক', 'days': 'দিন',
-                'quickActions': 'দ্রুত কর্ম', 'chatWithAI': 'এআই-এর সাথে চ্যাট',
-                'uploadNotes': 'নোট আপলোড', 'generateQuiz': 'কুইজ তৈরি',
-                'createPlan': 'প্ল্যান তৈরি', 'totalChats': 'এআই কথোপকথন',
-                'notesUploaded': 'নোট আপলোড', 'quizzesTaken': 'কুইজ সম্পন্ন',
-                'flashcardsCreated': 'ফ্ল্যাশকার্ড', 'yourAiHub': 'আপনার এআই-চালিত স্টাডি হাব'
+                'logout': 'লগআউট', 'streak': 'স্ট্রিক', 'days': 'দিন'
             },
             'zh': {
                 'dashboard': '仪表板', 'aiChat': 'AI聊天', 'notes': '笔记', 'quiz': '测验',
                 'planner': '计划表', 'flashcards': '抽认卡', 'about': '关于', 'settings': '设置',
-                'logout': '登出', 'streak': '连续学习', 'days': '天',
-                'quickActions': '快速操作', 'chatWithAI': '与AI聊天',
-                'uploadNotes': '上传笔记', 'generateQuiz': '生成测验',
-                'createPlan': '创建计划', 'totalChats': 'AI对话',
-                'notesUploaded': '上传的笔记', 'quizzesTaken': '完成的测验',
-                'flashcardsCreated': '抽认卡', 'yourAiHub': '您的AI驱动学习中心'
+                'logout': '登出', 'streak': '连续学习', 'days': '天'
             }
         };
 
@@ -401,27 +434,15 @@
         function updateUILanguage(lang) {
             const t = translations[lang];
             if(!t) return;
-
-            // Update sidebar navigation
             document.querySelectorAll('.nav-item').forEach(item => {
                 const key = item.getAttribute('data-key');
                 const span = item.querySelector('.nav-text');
                 if(span && t[key]) span.textContent = t[key];
             });
-
-            // Update streak text
             const streakSpan = document.getElementById('streakText');
             const daysSpan = document.getElementById('daysText');
             if(streakSpan && t['streak']) streakSpan.textContent = t['streak'];
             if(daysSpan && t['days']) daysSpan.textContent = t['days'];
-
-            // Update dashboard page elements if on dashboard
-            if(window.location.pathname === '/dashboard' || window.location.pathname === '/') {
-                const dashboardTitle = document.querySelector('.dashboard-title');
-                const dashboardSubtitle = document.querySelector('.dashboard-subtitle');
-                if(dashboardTitle && t['dashboard']) dashboardTitle.textContent = t['dashboard'];
-                if(dashboardSubtitle && t['yourAiHub']) dashboardSubtitle.textContent = t['yourAiHub'];
-            }
         }
 
         if(document.getElementById('languageSelect')) {
