@@ -1,23 +1,64 @@
 ﻿{% extends "base.html" %}
 {% block content %}
 <div>
-    <h1>📄 Notes</h1>
+    <h1>📄 Notes Manager</h1>
+    <p style="opacity: 0.7; margin-bottom: 30px;">Upload, search, and manage your study notes</p>
+
+    <!-- Upload Section -->
     <div class="card" style="margin-bottom: 30px;">
-        <h3>Upload Note</h3>
+        <h3>Upload New Note</h3>
         <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".pdf,.docx,.txt" required style="margin: 10px 0;">
-            <button type="submit" class="btn-primary">Upload & Analyze</button>
+            <input type="file" name="file" accept=".pdf,.docx,.txt" required style="margin: 10px 0; padding: 10px;">
+            <button type="submit" class="btn-primary">📤 Upload & Analyze</button>
         </form>
     </div>
+
+    <!-- Search Section -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="🔍 Search notes..." value="{{ search }}">
+        <button onclick="searchNotes()" class="btn-primary">Search</button>
+        {% if search %}
+        <a href="{{ url_for('notes') }}" class="btn-primary" style="background: #64748b;">Clear</a>
+        {% endif %}
+    </div>
+
+    <!-- Notes List -->
     {% if notes %}
-    <h3>Your Notes</h3>
+    <h3>Your Notes ({{ notes|length }})</h3>
     {% for note in notes %}
     <div class="card" style="margin-bottom: 15px;">
-        <div><h4>{{ note.original_name }}</h4><small>{{ note.created_at.strftime('%Y-%m-%d') }}</small><p>{{ note.summary[:200] }}...</p>
-        <a href="{{ url_for('view_note', note_id=note.id) }}" class="btn-primary" style="padding: 8px 20px; display: inline-block;">View</a>
-        <form method="POST" action="{{ url_for('delete_note', note_id=note.id) }}" style="display: inline-block; margin-left: 10px;"><button type="submit" style="background: #ef4444; border: none; padding: 8px 20px; border-radius: 30px; color: white; cursor: pointer;">Delete</button></form></div>
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div>
+                <h4>{{ note.original_name }}</h4>
+                <small>{{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                <p style="margin-top: 10px; opacity: 0.8;">{{ note.summary[:200] }}...</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="{{ url_for('view_note', note_id=note.id) }}" class="btn-primary" style="padding: 8px 16px; font-size: 0.9rem;">View</a>
+                <a href="{{ url_for('export_note_pdf', note_id=note.id) }}" class="btn-primary" style="padding: 8px 16px; font-size: 0.9rem; background: #10b981;">📄 PDF</a>
+                <form method="POST" action="{{ url_for('delete_note', note_id=note.id) }}" style="display: inline;">
+                    <button type="submit" style="background: #ef4444; border: none; padding: 8px 16px; border-radius: 30px; color: white; cursor: pointer;">Delete</button>
+                </form>
+            </div>
+        </div>
     </div>
     {% endfor %}
+    {% else %}
+    <div class="card" style="text-align: center;">
+        <i class="fas fa-folder-open" style="font-size: 3rem; opacity: 0.5;"></i>
+        <p style="margin-top: 15px;">No notes yet. Upload your first note!</p>
+    </div>
     {% endif %}
 </div>
+
+<script>
+function searchNotes() {
+    const searchTerm = document.getElementById('searchInput').value;
+    if(searchTerm) {
+        window.location.href = "{{ url_for('notes') }}?search=" + encodeURIComponent(searchTerm);
+    } else {
+        window.location.href = "{{ url_for('notes') }}";
+    }
+}
+</script>
 {% endblock %}

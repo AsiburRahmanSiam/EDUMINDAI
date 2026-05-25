@@ -4,21 +4,88 @@
     <h1 style="margin-bottom: 10px;">Dashboard</h1>
     <p style="opacity: 0.7; margin-bottom: 30px;">Your AI-powered study hub</p>
 
-    <div class="stats-grid">
-        <div class="stat-card"><i class="fas fa-comments"></i><h3>{{ total_chats }}</h3><p>AI Conversations</p></div>
-        <div class="stat-card"><i class="fas fa-file-alt"></i><h3>{{ total_notes }}</h3><p>Notes Uploaded</p></div>
-        <div class="stat-card"><i class="fas fa-question-circle"></i><h3>{{ total_quizzes }}</h3><p>Quizzes Taken</p></div>
-        <div class="stat-card"><i class="fas fa-layer-group"></i><h3>{{ total_flashcards }}</h3><p>Flashcards</p></div>
+    <!-- Study Streak Card -->
+    <div class="card" style="margin-bottom: 30px; text-align: center; background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.1));">
+        <i class="fas fa-fire" style="font-size: 2.5rem; color: #f59e0b;"></i>
+        <h2 style="margin-top: 10px;">Study Streak: {{ session.get('study_streak', 0) }} days</h2>
+        <p>Keep going! 🔥</p>
     </div>
 
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-comments"></i>
+            <h3>{{ total_chats }}</h3>
+            <p>AI Conversations</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-file-alt"></i>
+            <h3>{{ total_notes }}</h3>
+            <p>Notes Uploaded</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-question-circle"></i>
+            <h3>{{ total_quizzes }}</h3>
+            <p>Quizzes Taken</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-layer-group"></i>
+            <h3>{{ total_flashcards }}</h3>
+            <p>Flashcards</p>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="card" style="margin-bottom: 30px;">
+        <h3 style="margin-bottom: 20px;">📊 Quiz Performance</h3>
+        <canvas id="quizChart" style="max-height: 300px;"></canvas>
+    </div>
+
+    <!-- Quick Actions -->
     <div class="card">
         <h3>Quick Actions</h3>
         <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
-            <a href="{{ url_for('chat') }}" class="btn-primary">💬 Chat</a>
-            <a href="{{ url_for('notes') }}" class="btn-primary">📄 Upload</a>
-            <a href="{{ url_for('quiz') }}" class="btn-primary">📝 Quiz</a>
-            <a href="{{ url_for('planner') }}" class="btn-primary">📅 Plan</a>
+            <a href="{{ url_for('chat') }}" class="btn-primary">💬 Chat with AI</a>
+            <a href="{{ url_for('notes') }}" class="btn-primary">📄 Upload Notes</a>
+            <a href="{{ url_for('quiz') }}" class="btn-primary">📝 Generate Quiz</a>
+            <a href="{{ url_for('planner') }}" class="btn-primary">📅 Create Plan</a>
         </div>
     </div>
 </div>
+
+<script>
+    // Quiz Performance Chart
+    const ctx = document.getElementById('quizChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ quiz_labels | tojson }},
+            datasets: [{
+                label: 'Score Percentage (%)',
+                data: {{ quiz_percentages | tojson }},
+                backgroundColor: 'rgba(124, 58, 237, 0.6)',
+                borderColor: '#7c3aed',
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: { display: true, text: 'Score (%)', color: '#94a3b8' }
+                },
+                x: {
+                    title: { display: true, text: 'Quiz', color: '#94a3b8' }
+                }
+            },
+            plugins: {
+                legend: { labels: { color: '#94a3b8' } }
+            }
+        }
+    });
+</script>
 {% endblock %}

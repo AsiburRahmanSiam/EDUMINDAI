@@ -7,44 +7,97 @@
             <div class="message-content">
                 {{ msg.content | safe }}
                 {% if msg.role == 'assistant' %}
-                <button onclick="speakText('{{ msg.content | replace("'", "\\'") }}')" style="background: none; border: none; color: #8b5cf6; margin-top: 10px; cursor: pointer;">🔊 Play</button>
+                <button onclick="speakText('{{ msg.content | replace("'", "\\'") }}')" style="background: none; border: none; color: #8b5cf6; margin-top: 10px; cursor: pointer;">
+                    🔊 Play Audio
+                </button>
                 {% endif %}
             </div>
         </div>
         {% endfor %}
     </div>
+
     <div class="chat-input-container">
-        <button class="mic-btn" onclick="startVoiceInput()" style="background: rgba(255,255,255,0.1);"><i class="fas fa-microphone"></i></button>
-        <input type="text" id="messageInput" placeholder="Ask anything..." onkeypress="handleKeyPress(event)">
-        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        <button class="mic-btn" onclick="startVoiceInput()" style="background: rgba(255,255,255,0.1);">
+            <i class="fas fa-microphone"></i>
+        </button>
+        <input type="text" id="messageInput" placeholder="Ask me anything..." onkeypress="handleKeyPress(event)">
+        <button onclick="sendMessageWithTyping()" id="sendBtn">
+            <i class="fas fa-paper-plane"></i>
+        </button>
     </div>
 </div>
 
 <script>
 let currentLang = localStorage.getItem('language') || 'en';
+let isTyping = false;
 
-async function sendMessage() {
+async function sendMessageWithTyping() {
     const input = document.getElementById('messageInput');
-    const msg = input.value.trim();
-    if(!msg) return;
-    addMessage(msg, 'user');
+    const message = input.value.trim();
+    if(!message || isTyping) return;
+
+    // Disable send button
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.disabled = true;
+    sendBtn.style.opacity = '0.5';
+
+    addMessage(message, 'user');
     input.value = '';
-    const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg, language: currentLang })
-    });
-    const data = await res.json();
-    addMessage(data.reply, 'assistant');
+
+    // Show typing indicator
+    isTyping = true;
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message assistant';
+    typingDiv.id = 'typingIndicator';
+    typingDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+    document.getElementById('chatMessages').appendChild(typingDiv);
+    scrollToBottom();
+
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message, language: currentLang })
+        });
+        const data = await response.json();
+
+        // Remove typing indicator
+        document.getElementById('typingIndicator')?.remove();
+        isTyping = false;
+
+        addMessage(data.reply, 'assistant');
+    } catch(error) {
+        document.getElementById('typingIndicator')?.remove();
+        isTyping = false;
+        addMessage('⚠️ Network error. Please try again.', 'assistant');
+    }
+
+    // Re-enable send button
+    sendBtn.disabled = false;
+    sendBtn.style.opacity = '1';
 }
 
 function addMessage(text, role) {
-    const div = document.getElementById('chatMessages');
+    const messagesDiv = document.getElementById('chatMessages');
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${role}`;
-    msgDiv.innerHTML = `<div class="message-content">${text.replace(/\n/g, '<br>')}${role === 'assistant' ? '<button onclick="speakText(this.parentElement.innerText)" style="background:none;border:none;color:#8b5cf6;margin-top:10px;cursor:pointer">🔊 Play</button>' : ''}</div>`;
-    div.appendChild(msgDiv);
-    div.scrollTop = div.scrollHeight;
+
+    let content = text.replace(/\n/g, '<br>');
+    content = content.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+
+    msgDiv.innerHTML = `
+        <div class="message-content">
+            ${content}
+            ${role === 'assistant' ? '<button onclick="speakText(this.parentElement.innerText.split(\'🔊 Play\')[0])" style="background:none; border:none; color:#8b5cf6; margin-top:10px; cursor:pointer">🔊 Play Audio</button>' : ''}
+        </div>
+    `;
+    messagesDiv.appendChild(msgDiv);
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    const messagesDiv = document.getElementById('chatMessages');
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
 function startVoiceInput() {
@@ -52,11 +105,13 @@ function startVoiceInput() {
     recognition.lang = currentLang === 'bn' ? 'bn-BD' : currentLang === 'zh' ? 'zh-CN' : 'en-US';
     recognition.onresult = (event) => {
         document.getElementById('messageInput').value = event.results[0][0].transcript;
-        sendMessage();
+        sendMessageWithTyping();
     };
     recognition.start();
 }
 
-function handleKeyPress(e) { if(e.key === 'Enter') sendMessage(); }
+function handleKeyPress(event) {
+    if(event.key === 'Enter') sendMessageWithTyping();
+}
 </script>
 {% endblock %}
