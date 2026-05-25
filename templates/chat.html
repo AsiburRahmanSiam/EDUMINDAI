@@ -21,11 +21,9 @@
 </div>
 
 <script>
-// Get current language from localStorage (set by base.html)
 let currentLang = localStorage.getItem('language') || 'en';
 let isProcessing = false;
 
-// Send message function
 async function sendMessage() {
     if(isProcessing) return;
 
@@ -37,7 +35,6 @@ async function sendMessage() {
     input.value = '';
     isProcessing = true;
 
-    // Show typing indicator
     const typingDiv = document.createElement('div');
     typingDiv.className = 'message assistant';
     typingDiv.id = 'typingIndicator';
@@ -63,7 +60,6 @@ async function sendMessage() {
     isProcessing = false;
 }
 
-// Add message to chat
 function addMessage(text, role) {
     const div = document.getElementById('chatMessages');
     const msgDiv = document.createElement('div');
@@ -83,24 +79,9 @@ function scrollToBottom() {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-// Voice Input - Uses the currently selected language from the global selector
 function startVoiceInput() {
-    // Always get the latest language from localStorage
     currentLang = localStorage.getItem('language') || 'en';
-
-    let recognitionLang = 'en-US';
-    let displayLang = 'English';
-
-    if(currentLang === 'bn') {
-        recognitionLang = 'bn-BD';
-        displayLang = 'Bangla';
-    } else if(currentLang === 'zh') {
-        recognitionLang = 'zh-CN';
-        displayLang = 'Chinese';
-    } else {
-        recognitionLang = 'en-US';
-        displayLang = 'English';
-    }
+    let recognitionLang = currentLang === 'bn' ? 'bn-BD' : currentLang === 'zh' ? 'zh-CN' : 'en-US';
 
     const voiceBtn = document.getElementById('voiceBtn');
     voiceBtn.style.background = '#ef4444';
@@ -112,55 +93,19 @@ function startVoiceInput() {
     recognition.maxAlternatives = 1;
 
     recognition.onresult = (event) => {
-        const speechText = event.results[0][0].transcript;
-        document.getElementById('messageInput').value = speechText;
+        document.getElementById('messageInput').value = event.results[0][0].transcript;
         sendMessage();
         voiceBtn.style.background = '';
         voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
     };
 
     recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        let errorMsg = 'Voice input error';
-        if(event.error === 'no-speech') errorMsg = 'No speech detected. Please try again.';
-        else if(event.error === 'not-allowed') errorMsg = 'Microphone access denied. Please allow microphone.';
-        else if(event.error === 'language-not-supported') errorMsg = `${displayLang} language not supported. Try English.`;
-
-        showToast(errorMsg, 'danger');
         voiceBtn.style.background = '';
         voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
     };
 
     recognition.start();
 }
-
-function showToast(message, type) {
-    const container = document.getElementById('alertContainer');
-    if(container) {
-        const toast = document.createElement('div');
-        toast.className = `alert alert-${type}`;
-        toast.innerHTML = message;
-        container.prepend(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-}
-
-// Sync with language changes from base.html
-window.addEventListener('storage', function(e) {
-    if (e.key === 'language') {
-        currentLang = e.newValue;
-        showToast(`Language changed to ${currentLang.toUpperCase()}`, 'info');
-    }
-});
-
-// Also check for language changes periodically
-setInterval(() => {
-    const newLang = localStorage.getItem('language') || 'en';
-    if(newLang !== currentLang) {
-        currentLang = newLang;
-        console.log('Chat language synced to:', currentLang);
-    }
-}, 500);
 </script>
 
 <style>
@@ -185,18 +130,13 @@ setInterval(() => {
     0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
     30% { transform: translateY(-10px); opacity: 1; }
 }
-.chat-messages {
-    scroll-behavior: smooth;
-}
+.chat-messages { scroll-behavior: smooth; }
 .message-content pre {
     background: rgba(0,0,0,0.2);
     padding: 12px;
     border-radius: 8px;
     overflow-x: auto;
     margin: 10px 0;
-}
-.message-content code {
-    font-family: monospace;
 }
 </style>
 {% endblock %}

@@ -1,8 +1,8 @@
 ﻿{% extends "base.html" %}
 {% block content %}
 <div>
-    <h1 data-key="dashboard">Dashboard</h1>
-    <p style="opacity: 0.7; margin-bottom: 30px;" data-key="welcome">Your AI-powered study hub</p>
+    <h1 class="dashboard-title" style="margin-bottom: 10px;">Dashboard</h1>
+    <p class="dashboard-subtitle" style="opacity: 0.7; margin-bottom: 30px;">Your AI-powered study hub</p>
 
     <div class="stats-grid">
         <div class="stat-card">
@@ -37,4 +37,23 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Update dashboard texts when language changes
+    function updateDashboardTexts() {
+        const lang = localStorage.getItem('language') || 'en';
+        const translations = {
+            'en': { 'totalChats': 'AI Conversations', 'notesUploaded': 'Notes Uploaded', 'quizzesTaken': 'Quizzes Taken', 'flashcardsCreated': 'Flashcards', 'quickActions': 'Quick Actions', 'chatWithAI': 'Chat with AI', 'uploadNotes': 'Upload Notes', 'generateQuiz': 'Generate Quiz', 'createPlan': 'Create Plan' },
+            'bn': { 'totalChats': 'এআই কথোপকথন', 'notesUploaded': 'নোট আপলোড', 'quizzesTaken': 'কুইজ সম্পন্ন', 'flashcardsCreated': 'ফ্ল্যাশকার্ড', 'quickActions': 'দ্রুত কর্ম', 'chatWithAI': 'এআই-এর সাথে চ্যাট', 'uploadNotes': 'নোট আপলোড', 'generateQuiz': 'কুইজ তৈরি', 'createPlan': 'প্ল্যান তৈরি' },
+            'zh': { 'totalChats': 'AI对话', 'notesUploaded': '上传的笔记', 'quizzesTaken': '完成的测验', 'flashcardsCreated': '抽认卡', 'quickActions': '快速操作', 'chatWithAI': '与AI聊天', 'uploadNotes': '上传笔记', 'generateQuiz': '生成测验', 'createPlan': '创建计划' }
+        };
+        const t = translations[lang] || translations['en'];
+
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.getAttribute('data-key');
+            if(t[key]) el.textContent = t[key];
+        });
+    }
+    updateDashboardTexts();
+</script>
 {% endblock %}
