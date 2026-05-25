@@ -1,6 +1,6 @@
 ﻿"""
 EduMind Nexus AI - Complete Version with All Features
-Deployment Ready for Render.com
+Deployment Ready for Render.com with PostgreSQL Support
 """
 
 import os
@@ -23,7 +23,6 @@ from io import BytesIO
 # Try to import weasyprint, but don't fail if not available
 try:
     import weasyprint
-
     WEASYPRINT_AVAILABLE = True
 except ImportError:
     WEASYPRINT_AVAILABLE = False
@@ -33,7 +32,9 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'edumind-nexus-secret-key-2026')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///edumind.db'
+
+# PostgreSQL support - Use DATABASE_URL from Render, fallback to SQLite for local development
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///edumind.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
